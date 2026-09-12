@@ -12,6 +12,8 @@ SharpHound.exe --Domain <domain.tld> --CollectionMethods Default --OutputDirecto
 bloodhound-ce-python -u <username> -p '<password>' -d <domain.tld> -ns <dc-ip> -c Default --zip
 ```
 
+NetExec can also collect with a known account: `nxc ldap <dc-ip> -u <user> -p '<password>' --bloodhound -c all --dns-server <dc-ip>`. Check which BloodHound format your installed collector produces.
+
 Use a collector that matches BloodHound CE or Legacy. Upload the resulting ZIP to the matching platform. Collection failures can leave edges missing; an empty path is not proof that none exists.
 
 ## Queries to adapt

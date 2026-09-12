@@ -17,3 +17,9 @@ certipy auth -pfx <issued-certificate>.pfx -dc-ip <dc-ip>
 ```
 
 Certipy command names and options vary by installed version; check `certipy --help` locally. For ESC8, first confirm that HTTP enrollment and the relevant NTLM authentication path are present.
+
+If you have a certificate but Kerberos PKINIT returns `KDC_ERR_PADATA_TYPE_NOSUPP`, check whether Schannel/LDAP authentication is available before discarding the certificate:
+
+```bash
+certipy auth -pfx <issued-certificate>.pfx -dc-ip <dc-ip> -ldap-shell
+```

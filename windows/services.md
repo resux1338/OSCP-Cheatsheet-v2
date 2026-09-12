@@ -16,3 +16,14 @@ schtasks.exe /query /fo LIST /v
 ```
 
 Record the task's principal, action, trigger, and whether its executable or script is writable. Restore any replaced file after verification.
+
+## Installer policy
+
+`AlwaysInstallElevated` needs both policy values set to `1`. Check both before considering an MSI path:
+
+```powershell
+reg query HKCU\Software\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKLM\Software\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+```
+
+If both are `1` and you have a suitable MSI payload, `msiexec /quiet /qn /i <payload>.msi` tests the path. See [payload formats](../foothold/shells.md#msfvenom-payloads).

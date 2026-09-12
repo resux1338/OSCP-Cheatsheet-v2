@@ -18,7 +18,7 @@ Use the port list to choose a focused check. Record hostnames, domains, version 
 | 161/UDP | [SNMP](snmp.md) | Community and targeted OIDs |
 | 389, 636 | [LDAP](../ad/ldap-and-sessions.md) | Naming context and accessible objects |
 | 1433, 3306, 5432, 6379 | [Databases and Redis](databases-and-redis.md) | Login, current role, and accessible data |
-| 3389, 5985, 5986 | [Windows remote access](../04-windows-privesc.md) | RDP/WinRM login and account rights |
+| 3389, 5985, 5986 | [Windows remote access](remote-access.md) | RDP/WinRM login and account rights |
 
 On a Windows foothold, confirm a selected TCP port with `Test-NetConnection -ComputerName <target-ip> -Port 445` before blaming a failed login on credentials.
 

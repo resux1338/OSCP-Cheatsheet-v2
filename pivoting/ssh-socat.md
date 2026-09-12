@@ -24,6 +24,8 @@ ssh -N -D 1080 <user>@<pivot>
 proxychains nmap -sT -Pn -p 139,445,3389 <internal-ip>
 ```
 
+If SSH access and Python are available and you need a routed subnet, `sshuttle -r <user>@<pivot> <internal-subnet>/24` is another option. Check that the chosen subnet does not overlap an existing route.
+
 Set `socks5 127.0.0.1 1080` in Kali's `/etc/proxychains4.conf` for that local SOCKS listener. If the SOCKS listener is on the foothold instead, use its reachable address in the configuration.
 
 Confirm listeners with `ss -lntp` and remove stale tunnels before reusing a port. Bind to `0.0.0.0` only when another host must reach the listener.

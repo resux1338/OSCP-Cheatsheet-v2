@@ -22,6 +22,7 @@ Mongo-backed JSON and URL parameters may accept operators instead of literal str
 ```text
 {"user":{"$ne":null},"pass":{"$ne":null}}
 user[$ne]=x&pass[$ne]=x
+user[$regex]=^admin
 ```
 
 ## Server-side templates
@@ -46,4 +47,6 @@ Decode the header and payload offline, then check the algorithm, signature handl
 hashcat -m 16500 jwt.txt rockyou.txt
 ```
 
-Check the installed Hashcat mode list before relying on the example. For parser clues, see [insecure deserialization](../02-foothold.md#insecure-deserialization).
+An `alg:none` header or a weak HMAC key matters only if the server accepts the changed token. If an implementation mixes asymmetric and HMAC keys, check whether it incorrectly accepts its public key as an HMAC secret.
+
+Check the installed Hashcat mode list before relying on the example. For parser clues, see [insecure deserialization](insecure-deserialization.md).

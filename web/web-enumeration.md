@@ -22,3 +22,13 @@ ffuf -u 'http://<target-ip>/page.php?FUZZ=test' -w <parameter-list> -fs <baselin
 ```
 
 Scan output is a lead. Manually confirm any claimed file exposure, input reflection, or authentication weakness.
+
+When a CMS is identified, enumerate that product and its installed components:
+
+```bash
+wpscan --url http://<target> --enumerate u,vp,vt
+droopescan scan drupal -u http://<target>
+joomscan -u http://<target>
+```
+
+Check exposed `.git/`, backup extensions, `robots.txt`, and JavaScript for endpoints or credentials before trying a generic exploit.

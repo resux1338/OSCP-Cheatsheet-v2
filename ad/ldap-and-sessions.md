@@ -4,6 +4,16 @@
 
 Use this when you have a domain foothold but the AD PowerShell module is missing. Search from the domain DN and filter before collecting a large result set.
 
+From Kali, a known account can give a quick user, group, share, and policy baseline:
+
+```bash
+nxc smb <dc-ip> -u <user> -p '<password>' --shares --users --groups --pass-pol
+nxc smb <dc-ip> -u <user> -p '<password>' --rid-brute
+ldapdomaindump -u '<domain>\\<user>' -p '<password>' <dc-ip>
+```
+
+If anonymous RPC is available, `rpcclient -U '' -N <dc-ip>` can list users and groups with `enumdomusers` and `enumdomgroups`. A scoped username list can also be checked with `kerbrute userenum -d <domain.tld> --dc <dc-ip> users.txt`.
+
 ## LDAP from PowerShell
 
 ```powershell

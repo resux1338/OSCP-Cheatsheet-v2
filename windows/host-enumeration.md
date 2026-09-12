@@ -30,3 +30,21 @@ Get-History
 ```
 
 An enumeration script is a lead generator. Verify the file ACL, service context, task trigger, or credential against the host before using it.
+
+For a wider local sweep, use the tool you have staged, then verify its findings manually:
+
+```powershell
+.\winPEASany.exe
+.\PrivescCheck.ps1; Invoke-PrivescCheck
+.\Seatbelt.exe -group=all
+. .\PowerUp.ps1
+Invoke-AllChecks
+```
+
+If the host build suggests a local issue, compare the exact patch level with a trusted advisory before using an exploit. `wesng.py` can sort candidates from saved `systeminfo` output.
+
+If a transferred tool fails to run, confirm that the file arrived intact and check the local protection status before blaming the exploit path:
+
+```powershell
+Get-MpComputerStatus
+```
