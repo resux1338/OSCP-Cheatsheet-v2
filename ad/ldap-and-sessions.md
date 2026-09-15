@@ -2,9 +2,9 @@
 
 [← Active Directory quick reference](../05-active-directory.md)
 
-Use this when you have a domain foothold but the AD PowerShell module is missing. Search from the domain DN and filter before collecting a large result set.
+Without AD module: query LDAP from domain DN with a narrow filter.
 
-From Kali, a known account can give a quick user, group, share, and policy baseline:
+Kali baseline with known account:
 
 ```bash
 nxc smb <dc-ip> -u <user> -p '<password>' --shares --users --groups --pass-pol
@@ -12,7 +12,7 @@ nxc smb <dc-ip> -u <user> -p '<password>' --rid-brute
 ldapdomaindump -u '<domain>\\<user>' -p '<password>' <dc-ip>
 ```
 
-If anonymous RPC is available, `rpcclient -U '' -N <dc-ip>` can list users and groups with `enumdomusers` and `enumdomgroups`. A scoped username list can also be checked with `kerbrute userenum -d <domain.tld> --dc <dc-ip> users.txt`.
+Anonymous RPC: `rpcclient -U '' -N <dc-ip>` → `enumdomusers`, `enumdomgroups`. Scoped user check: `kerbrute userenum -d <domain.tld> --dc <dc-ip> users.txt`.
 
 ## LDAP from PowerShell
 
@@ -26,9 +26,9 @@ $searcher.Filter = "(samAccountType=805306368)"
 $searcher.FindAll()
 ```
 
-The PDC is one discovered domain controller, not proof that other DCs have stale data. Keep the DN broad enough for the objects you need; adding `CN=Users` limits the search to that container.
+PDC discovery does not compare DC freshness. `CN=Users` limits search to that container.
 
-For a reusable query:
+Reusable LDAP query:
 
 ```powershell
 function LDAPSearch {
@@ -43,7 +43,7 @@ function LDAPSearch {
 LDAPSearch -LDAPQuery "(objectClass=group)"
 ```
 
-Inspect `member` on each returned group and follow nested group DNs. A direct-membership list can miss the route that matters.
+Follow nested group DNs via `member`.
 
 ## Hosts and sessions
 
@@ -54,7 +54,7 @@ Get-NetUser | Select-Object samaccountname,description
 Find-LocalAdminAccess
 ```
 
-`Find-LocalAdminAccess` queries across the domain and can generate noticeable traffic. Use a smaller host set when scope or time calls for it.
+`Find-LocalAdminAccess` is domain-wide; use a smaller host set when needed.
 
 ```powershell
 Get-NetSession -ComputerName <server-01> -Verbose
@@ -64,7 +64,7 @@ Get-NetSession -ComputerName <server-01> -Verbose
 PsLoggedon.exe \\<server-01>
 ```
 
-`Get-NetSession` reads resource sessions; it is not a complete list of interactive logons. PsLoggedOn also depends on remote registry access for locally loaded profiles. Access denied or an empty result does not prove that nobody is logged on. Your own query can appear as a resource session.
+`Get-NetSession` = resource sessions; PsLoggedOn needs remote registry. Empty/access denied ≠ nobody logged on; your query may appear.
 
 ## References
 

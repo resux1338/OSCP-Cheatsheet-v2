@@ -46,7 +46,7 @@ stty rows 50 cols 200   # target
 ```
 
 ## Fully-interactive Windows shell (ConPtyShell: the Windows `stty` trick)
-Upgrade a dumb Windows shell to a real PTY (tab, history, working Ctrl-C):
+Windows shell upgrade (ConPtyShell):
 ```bash
 # kali: raw terminal, note size, then listen
 stty raw -echo; (stty size)          # -> e.g. 50 200

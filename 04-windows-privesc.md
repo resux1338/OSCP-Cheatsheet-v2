@@ -2,7 +2,7 @@
 
 > Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
 
-Get the current token and host build first. Match each lead to the exact right, writable path, and trigger.
+Token/build first; then exact right, writable path, and trigger.
 
 ```powershell
 whoami /all

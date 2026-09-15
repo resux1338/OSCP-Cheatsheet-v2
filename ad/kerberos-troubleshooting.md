@@ -2,7 +2,7 @@
 
 [← Active Directory quick reference](../05-active-directory.md)
 
-Use the domain's full DNS name and the target service's FQDN. Keep the ticket cache tied to the account that obtained it.
+Use domain FQDN + service FQDN; keep cache tied to its account.
 
 ```bash
 getent hosts <dc-fqdn>
@@ -19,4 +19,4 @@ echo "$KRB5CCNAME"
 | Ticket exists, service fails | Check the service SPN, target FQDN, ticket account, and clock. |
 | LDAP bind requires stronger auth | Try a Kerberos-authenticated or sealed LDAP path; see [object rights](object-rights.md). |
 
-For a command that supports Kerberos cache authentication, get a TGT with the matching account and set `KRB5CCNAME` to its cache file. Check the installed tool's options before adding `-k -no-pass`.
+Get matching TGT, set `KRB5CCNAME`, then use the tool's cache flags (often `-k -no-pass`).

@@ -2,7 +2,7 @@
 
 [← Windows services](services.md)
 
-This path is about **file permissions** on the executable a service already runs. It does not require permission to change the service configuration. Check the service account, exact binary path, your effective file rights, and a start or restart trigger.
+Need writable service executable + privileged service account + start/restart trigger.
 
 ```powershell
 Get-CimInstance -ClassName Win32_Service |
@@ -12,9 +12,9 @@ icacls 'C:\Path\To\service.exe'
 sc.exe query <service-name>
 ```
 
-Read `PathName` carefully: it can contain arguments after the executable. Check the ACL on the executable itself and, if needed, its directory. `(M)` or `(F)` matters only if it belongs to your user or one of your effective groups. `sc.exe` avoids PowerShell's `sc` alias for `Set-Content`.
+Separate executable from arguments in `PathName`; check your effective `(M)`/`(F)` ACL. Use `sc.exe` in PowerShell.
 
-If the binary is writable, check the service state and save a copy before changing it. Use the exact service name and a trigger you can reach:
+Save binary; check exact service name/state and trigger:
 
 ```powershell
 sc.exe query <service-name>
@@ -25,13 +25,13 @@ Copy-Item '.\replacement.exe' 'C:\Path\To\service.exe'
 sc.exe start <service-name>
 ```
 
-An already running service needs a restart; `SERVICE_START` alone does not grant `SERVICE_STOP`. If you cannot control it, check its normal trigger before making a file change. Restore the original after the test:
+Running service needs restart (`SERVICE_START` ≠ `SERVICE_STOP`). Restore original after test:
 
 ```powershell
 Copy-Item $backup 'C:\Path\To\service.exe'
 ```
 
-PowerUp can find candidate files, but confirm the ACL and trigger yourself:
+PowerUp lead; verify ACL and trigger:
 
 ```powershell
 . .\PowerUp.ps1

@@ -2,12 +2,13 @@
 
 > Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
 
-Choose a test that matches the input or access you actually have. Compare each result with a normal request before changing several things at once.
+Pick the row matching the input; compare against a normal request.
 
 | Possible path | Quick fit check | Details |
 | --- | --- | --- |
 | SQL input | Change one quote or condition and compare errors, rows, or timing. | [Manual SQLi](web/manual-sqli.md) |
-| File path or include | Try a known readable file; check whether the app returns file content or evaluates it. | [Traversal and inclusion](web/files-and-commands.md) |
+| File path or include | Try a known readable file; check whether the app returns file content or evaluates it. | [LFI and traversal](web/lfi.md) |
+| Remote URL used as a file | Serve a marker file; confirm a server fetch and whether the returned PHP is interpreted. | [RFI](web/rfi.md) |
 | File upload | Find the saved path and test whether the server executes that file type. | [Uploads](web/files-and-commands.md#file-upload) |
 | Shell-backed input | Compare a harmless command or short delay with a baseline. | [Command injection](web/files-and-commands.md#command-injection) |
 | Template input | Try one arithmetic expression and a second value in the same syntax. | [SSTI](web/ssti.md) |
@@ -20,4 +21,4 @@ Choose a test that matches the input or access you actually have. Compare each r
 | Known app or path filter | Check version, plugins, default access, and path normalization. | [Application paths](web/application-paths.md) |
 | Public PoC | Match the exact version and read the code before running or compiling it. | [Public exploits](foothold/public-exploits.md) |
 
-If you have code execution, verify it with `id` or `whoami` before building a callback. Then choose a [shell and terminal upgrade](foothold/shells.md), [payload format](foothold/shells.md#msfvenom-payloads), and [file transfer](foothold/file-transfer.md) that fit the target.
+After code execution: `id`/`whoami` → [shell](foothold/shells.md) · [payload](foothold/shells.md#msfvenom-payloads) · [transfer](foothold/file-transfer.md).

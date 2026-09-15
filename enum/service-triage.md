@@ -2,7 +2,7 @@
 
 [← Recon quick reference](../01-recon.md)
 
-Use the port list to choose a focused check. Record hostnames, domains, version hints, and the credential used for each result.
+Map each open port to a focused check; retain names, versions, and credential used.
 
 | Port | Topic | First check |
 | --- | --- | --- |
@@ -20,6 +20,6 @@ Use the port list to choose a focused check. Record hostnames, domains, version 
 | 1433, 3306, 5432, 6379 | [Databases and Redis](databases-and-redis.md) | Login, current role, and accessible data |
 | 3389, 5985, 5986 | [Windows remote access](remote-access.md) | RDP/WinRM login and account rights |
 
-On a Windows foothold, confirm a selected TCP port with `Test-NetConnection -ComputerName <target-ip> -Port 445` before blaming a failed login on credentials.
+Windows reachability: `Test-NetConnection -ComputerName <target-ip> -Port 445`.
 
-A fast scan can miss services on a lossy VPN. Re-run at a lower rate when a host looks empty. Check the installed tool's help before relying on a flag copied from an older note.
+Lossy VPN/empty host: rescan slower. Check local tool help for flags.

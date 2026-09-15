@@ -2,7 +2,7 @@
 
 > Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
 
-Start with the domain name, DC address, and credential you control. Keep the account, right, target object, and reachable service together for each path.
+Record domain, DC, credential; for each path, account + right + target + service.
 
 | Possible path | Quick fit check | Details |
 | --- | --- | --- |
@@ -17,6 +17,6 @@ Start with the domain name, DC address, and credential you control. Keep the acc
 | Ticket material | Match the key or ticket to its account, SPN, service, and domain. | [Tickets](ad/tickets.md) |
 | Kerberos fails | Check FQDN, DNS, clock skew, SPN, and the ticket cache. | [Kerberos checks](ad/kerberos-troubleshooting.md) |
 | Login but no execution | Check local admin rights and whether the matching remote service is open. | [Lateral movement](ad/lateral-movement.md) |
-| Advanced object path | Check prerequisite rights and DC support before changing an object. | [Advanced object paths](ad/object-rights.md#sealed-ldap-object-restore--newer-primitives) |
+| Advanced object path | Check prerequisite rights and DC support before changing an object. | [Advanced object paths](ad/object-rights.md#sealed-ldap-object-restore-newer-primitives) |
 
-After each new credential or host, repeat the first domain picture with that account's access. A BloodHound path is a lead until its rights and target are confirmed.
+After new credentials, re-enumerate with that account. Confirm BloodHound rights on the target.

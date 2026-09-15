@@ -2,7 +2,7 @@
 
 > Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
 
-Run the baseline first. A version, group name, or writable file is a lead; the privilege and trigger decide whether it is a path.
+Run baseline; confirm the privilege, writable target, and trigger for each lead.
 
 ```bash
 id; sudo -l; uname -r; cat /etc/os-release
@@ -21,4 +21,4 @@ id; sudo -l; uname -r; cat /etc/os-release
 | Restricted shell | Test whether an allowed interpreter or command can start a normal shell. | [Restricted shells](linux/restricted-shells.md) |
 | Kernel or package issue | Match the exact build, architecture, and patch state after local paths fail. | [Kernel checks](linux/kernel-checks.md) |
 
-When a command fails, check the current user, file permissions, and how the privileged process reaches that code. Do not assume the scheduled task or service ran.
+Failed path: check current user, ACL, and whether the privileged trigger ran.

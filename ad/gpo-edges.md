@@ -2,7 +2,7 @@
 
 [← Active Directory quick reference](../05-active-directory.md)
 
-BloodHound's `GPLink` edge says where a GPO applies. It does not grant a right to edit that GPO. Check control of the GPO, its SYSVOL files, and its effective scope before planning a change.
+`GPLink` = GPO applies there. Need edit rights on GPO/SYSVOL + effective scope.
 
 | Edge | Check next |
 | --- | --- |
@@ -11,7 +11,7 @@ BloodHound's `GPLink` edge says where a GPO applies. It does not grant a right t
 | `GPLink` to an OU or domain | Is the target computer in scope after link state, inheritance, and filtering? |
 | `WriteGPLink` on an OU or domain | Is there also a GPO the principal controls and can link? |
 
-Record the GPO GUID, `gPCFileSysPath`, `versionNumber`, machine extensions, link order, and original files before changing anything. A computer-side task and a user-side task run under different accounts; confirm which object receives the policy.
+Save GUID, `gPCFileSysPath`, version, extensions, link order, original files. Confirm user vs computer policy target.
 
 ## Inspect and back up
 
@@ -32,7 +32,7 @@ Get-GPInheritance -Target '<OU-or-domain-DN>' -Domain '<domain.tld>' -Server '<d
     Format-List GpoInheritanceBlocked,GpoLinks,InheritedGpoLinks
 ```
 
-Check the affected account and trigger on a test policy before changing a live GPO. Restore the saved state after the test.
+Test affected account/trigger; restore saved GPO state.
 
 ## References
 

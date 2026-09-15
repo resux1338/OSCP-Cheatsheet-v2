@@ -2,7 +2,7 @@
 
 > Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
 
-Start with a full TCP scan, then test only the services you found. Record the hostname, domain, open ports, and which credentials worked.
+Full TCP scan → service checks. Record names, ports, and working credentials.
 
 ```bash
 nmap -Pn -p- -T3 "$IP"
@@ -22,4 +22,4 @@ nmap -Pn -p- -T3 "$IP"
 | Remote login | Test a known account against the matching service and account scope. | [RDP and WinRM](enum/remote-access.md) |
 | Domain controller | Resolve the full domain name and check LDAP, SMB, and Kerberos. | [AD](05-active-directory.md) |
 
-Repeat the relevant service check after finding credentials. An empty anonymous result is not the final result.
+Repeat service checks with each new credential.

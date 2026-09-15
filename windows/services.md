@@ -2,7 +2,7 @@
 
 [← Windows quick reference](../04-windows-privesc.md)
 
-For a service finding, check what account runs it, what you can change, and how it starts. These are separate paths:
+For each service: account + changeable object/file + trigger.
 
 - [Service binary hijacking](service-binary-hijacking.md): you can write to the executable on disk.
 - [Service permissions](service-permissions.md): you can change the service configuration, including `binPath`.
@@ -15,15 +15,15 @@ Get-ScheduledTask | Select-Object TaskName,State,Actions,Principal
 schtasks.exe /query /fo LIST /v
 ```
 
-Record the task's principal, action, trigger, and whether its executable or script is writable. Restore any replaced file after verification.
+Task: principal, action, trigger, writable executable/script; restore replaced file.
 
 ## Installer policy
 
-`AlwaysInstallElevated` needs both policy values set to `1`. Check both before considering an MSI path:
+`AlwaysInstallElevated`: both policy values must be `1`:
 
 ```powershell
 reg query HKCU\Software\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 reg query HKLM\Software\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 ```
 
-If both are `1` and you have a suitable MSI payload, `msiexec /quiet /qn /i <payload>.msi` tests the path. See [payload formats](../foothold/shells.md#msfvenom-payloads).
+If both are `1`: `msiexec /quiet /qn /i <payload>.msi` ([payload formats](../foothold/shells.md#msfvenom-payloads)).

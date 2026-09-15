@@ -2,7 +2,7 @@
 
 [← Service index](service-triage.md) · [AD shares and ACLs](../ad/spn-acl-shares.md)
 
-Start with anonymous and guest access, then repeat with a known account. A share listing does not prove that you can read the share or write to it.
+Anonymous/guest first; repeat with credentials. Test each share's read/write access.
 
 ```bash
 smbclient -L //<target-ip>/ -U '' -N
@@ -12,25 +12,25 @@ enum4linux-ng -A <target-ip>
 smbmap -H <target-ip> -u null
 ```
 
-Open one share and inspect its contents. `-U` prompts for the password when you omit it from the argument:
+Open share (`-U` prompts for password):
 
 ```bash
 smbclient //<target-ip>/<share> -U '<domain>/<user>'
 smbclient //<target-ip>/<share> -U '<domain>/<user>' -c 'ls; get notes.txt'
 ```
 
-Inside `smbclient`, use `pwd`, `ls`, `cd`, and `get`. Use `put` only after confirming write scope and choosing a harmless test file. Check `SYSVOL` for scripts and policy files, and keep the remote path with anything you copy.
+Inside: `pwd`, `ls`, `cd`, `get`; harmless `put` to test write. Check `SYSVOL`; retain source paths.
 
-If RPC allows a null session, query users and groups without guessing names:
+RPC null session:
 
 ```bash
 rpcclient -U '' -N <target-ip> -c 'enumdomusers'
 rpcclient -U '' -N <target-ip> -c 'enumdomgroups'
 ```
 
-With a known account, `nxc smb <target-ip> -u <user> -p '<password>' --rid-brute` can fill in names that anonymous RPC hides. Check the account lockout policy before any login testing.
+Known account RID enumeration: `nxc smb <target-ip> -u <user> -p '<password>' --rid-brute`.
 
-Check SMB2/3 signing before considering any authentication-relay path. This is a configuration check, not proof that a relay will work:
+SMB signing check (relay still needs a viable auth path):
 
 ```bash
 nmap -p445 --script smb2-security-mode <target-ip>

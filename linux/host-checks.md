@@ -2,14 +2,14 @@
 
 [← Linux quick reference](../03-linux-privesc.md)
 
-Look for credentials and reachable services before chasing a kernel issue. Record the current user and the exact file or process that exposed each lead.
+Start with current user, credentials, and reachable services.
 
 ```bash
 ./linpeas.sh | tee linpeas.txt
 ./pspy64
 ```
 
-Use automated output to select a path, then verify the permission, owner, and trigger manually.
+Verify permission, owner, and trigger behind tool hits.
 
 ```bash
 id
@@ -19,6 +19,11 @@ ss -tlnp
 ps -eo user,pid,ppid,cmd --forest
 ```
 
-Check readable application configs, database settings, shell history, `.mysql_history`, `.viminfo`, mail, backups, and SSH keys. A found password may work for `su`, SSH, an app, or another service, but test the matching account deliberately.
+Search app/DB configs, histories, mail, backups, SSH keys; test recovered creds against their account/service.
 
-For a loopback-only service, confirm its port from the host and forward just that service through the [pivoting notes](../06-pivoting.md).
+```bash
+find /home /opt /srv /var/www -type f \( -name '.*history' -o -name '.viminfo' -o -name 'id_rsa' -o -name '*.conf' -o -name '.env' \) 2>/dev/null
+grep -RniE 'pass(word)?|secret|token|api.?key' /var/www /opt /srv 2>/dev/null
+```
+
+Loopback service: verify port, then [forward it](../06-pivoting.md).

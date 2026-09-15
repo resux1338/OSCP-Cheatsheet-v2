@@ -4,7 +4,7 @@
 
 ## Path normalization
 
-Test path variants only when a proxy, server, or application filter appears to disagree about how it parses the URL. Compare the response with the canonical path and a known missing path.
+Compare each variant with the canonical and a missing path.
 
 | Clue | Check |
 | --- | --- |
@@ -22,4 +22,4 @@ Test path variants only when a proxy, server, or application filter appears to d
 | Jenkins | Whether the account can reach `/script` and run a harmless Groovy expression. |
 | Exposed Git | Whether `.git/` is readable and contains source or credentials. |
 
-A default credential or version match is a lead until the target accepts it.
+Confirm version, credentials, and access on target.

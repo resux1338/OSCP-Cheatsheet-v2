@@ -2,7 +2,7 @@
 
 [← Service index](service-triage.md)
 
-These services are easy to skip when a web port is open. Check what each one exposes before trying credentials.
+Check every identified service, including non-web ports.
 
 ## SSH: 22
 
@@ -11,7 +11,7 @@ ssh-keyscan -T 5 <target-ip>
 ssh -v <user>@<target-ip>
 ```
 
-The key scan records the server's advertised host key; it does not authenticate the host by itself. With a supplied key, check its permissions and connect with `ssh -i <key-file> <user>@<target-ip>`.
+`ssh-keyscan` records advertised key only. Supplied key: `chmod 600 <key-file>; ssh -i <key-file> <user>@<target-ip>`.
 
 ## Telnet and Finger: 23, 79
 
@@ -21,7 +21,7 @@ finger @<target-ip>
 finger <user>@<target-ip>
 ```
 
-Telnet sends login data without TLS unless protected by another layer. Finger may disclose usernames or session details; an empty reply is not a user-validity test.
+Telnet is plaintext. Finger can disclose users/sessions; empty output is inconclusive.
 
 ## rsync daemon: 873
 
@@ -31,11 +31,11 @@ rsync rsync://<target-ip>/<module>/
 rsync rsync://<target-ip>/<module>/<known-file> ./
 ```
 
-The first command lists advertised modules, the second lists a selected module, and the third copies one file. A module can be hidden or require credentials. Direct daemon connections are not encrypted, so avoid sending sensitive credentials over an untrusted path.
+Rsync: list modules → list selected module → copy file. Hidden/authenticated modules may not list; daemon transport is plaintext.
 
 ## TFTP: 69/UDP
 
-TFTP has no normal directory-list command. Try a known filename from a configuration, web page, or device hint:
+TFTP has no normal listing; request a known filename:
 
 ```bash
 curl -o <local-file> 'tftp://<target-ip>/<known-file>'

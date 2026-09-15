@@ -2,7 +2,7 @@
 
 [← Foothold quick reference](../02-foothold.md)
 
-Look for a user-controlled value that the server turns back into an object. A format clue is only a lead; confirm the parser and the reachable code path before choosing a payload.
+Identify the serialized value, parser, and reachable class/gadget path.
 
 | Stack | Clue to check |
 | --- | --- |
@@ -11,4 +11,4 @@ Look for a user-controlled value that the server turns back into an object. A fo
 | PHP | `unserialize()` on input you control, with reachable `__wakeup()` or `__destruct()` methods. |
 | Python | `pickle.loads()` on input you control. |
 
-Compare a normal serialized value with one harmless change. An error or format match is not proof of code execution.
+Compare baseline with one harmless change; parser errors alone do not prove execution.

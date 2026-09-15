@@ -4,7 +4,7 @@
 
 ## TCP and UDP scans
 
-Create `nmap/` before using these output paths. Raise the scan rate only if the connection is reliable.
+Create `nmap/`; increase rate only on a reliable link.
 
 ```bash
 # Fast full TCP port discovery
@@ -18,7 +18,7 @@ sudo nmap -sU --top-ports 100 -oN nmap/udp.txt "$IP"
 # Check selected services manually before choosing a vulnerability test.
 ```
 - `-sCV` = default scripts + version. `-Pn` skips host discovery.
-- **Tuning gotchas:** `-A` already includes `-sC` and `-sV`, so use one approach. An aggressive discovery rate can miss ports on a lossy VPN. If a host looks empty, re-run the sweep at a lower rate before assuming it has no services.
+- `-A` includes `-sC -sV`; lossy VPN/empty result → rescan slower.
 - **AutoRecon** / nmapAutomator fan out per-service checks. Review the configured commands and read the output yourself.
 - Always note the **OS hint, hostname, domain name** (add to `/etc/hosts`).
 
@@ -26,4 +26,4 @@ sudo nmap -sU --top-ports 100 -oN nmap/udp.txt "$IP"
 ```bash
 echo "$IP corp.example dc01.corp.example target" | sudo tee -a /etc/hosts
 ```
-Use the hostname from DNS, a redirect, or a TLS certificate. Virtual hosts and SNI can serve a different site than the bare IP.
+Use discovered hostname for vhost/SNI; bare IP may differ.

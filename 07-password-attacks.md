@@ -2,7 +2,7 @@
 
 > Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
 
-Identify the material before choosing a mode or login service. Record where it came from and which account it belongs to.
+Identify hash/credential type and account before choosing a mode or service.
 
 | Material or access | Quick fit check | Details |
 | --- | --- | --- |
@@ -14,4 +14,4 @@ Identify the material before choosing a mode or login service. Record where it c
 | Online login | Check lockout policy, account scope, response baseline, and token handling first. | [Online login checks](passwords/online-logins.md) |
 | Credentials found | Test plausible services, then return to [Recon](01-recon.md), [Foothold](02-foothold.md), or [AD](05-active-directory.md). | [Service triage](enum/service-triage.md) |
 
-If every online attempt appears valid, verify the failure signal and whether a per-request token changed.
+Every login looks valid? Recheck failure string and per-request token.

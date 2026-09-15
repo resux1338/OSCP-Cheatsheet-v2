@@ -2,7 +2,7 @@
 
 > Part of the **OSCP/OSCP+ cheatsheet** | [← back to index](README.md)
 
-First test whether the foothold can reach the internal target. Then choose a tunnel for one port, a SOCKS proxy, or a routed subnet.
+Check foothold → target reachability; then choose port forward, SOCKS, or subnet route.
 
 | Need | Quick fit check | Details |
 | --- | --- | --- |

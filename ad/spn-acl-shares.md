@@ -2,11 +2,11 @@
 
 [← Active Directory quick reference](../05-active-directory.md)
 
-After the user, group, and host baseline, map service accounts and object rights. Record the principal, right, target, and whether the right is inherited before testing a path.
+Map SPNs and ACLs; record principal + right + target + inheritance.
 
 ## Service principal names
 
-An SPN identifies a Kerberos service instance. It can also point to a service account, hostname, and port worth checking.
+Use SPNs to find service accounts, hosts, and ports.
 
 ```powershell
 Get-NetUser -SPN | Select-Object samaccountname,serviceprincipalname
@@ -19,7 +19,7 @@ setspn -L <service-account>
 
 ## Object ACLs
 
-Look for `GenericAll`, `GenericWrite`, `WriteOwner`, `WriteDACL`, `AllExtendedRights`, and `ForceChangePassword` on the exact target object. Resolve SIDs; a raw ACE is not yet an attack path.
+Resolve SIDs; verify `GenericAll`, `GenericWrite`, `WriteOwner`, `WriteDACL`, `AllExtendedRights`, `ForceChangePassword` on exact target.
 
 ```powershell
 Get-ObjectAcl -Identity <user>
@@ -29,11 +29,11 @@ Get-ObjectAcl -Identity '<group>' |
     Select-Object SecurityIdentifier,ActiveDirectoryRights
 ```
 
-For a confirmed `WriteOwner` or `WriteDACL` path, save the original owner and ACL before a manual change. Restore both afterward.
+`WriteOwner`/`WriteDACL`: save and restore owner + ACL.
 
 ## Shares and SYSVOL
 
-Check custom shares, scripts, policy backups, and documentation. A recovered password may be old; record its file and test it only within scope.
+Search custom shares, scripts, policy backups, docs; retain source path for recovered creds.
 
 ```powershell
 Find-DomainShare
@@ -45,9 +45,9 @@ Get-ChildItem \\<file-server>\<share>
 gpp-decrypt '<CPASSWORD>'
 ```
 
-An accessible share becomes an execution path only if a higher-privileged process loads something from it. Confirm that trigger before treating write access as code execution.
+Writable share needs a privileged load trigger for execution.
 
-For larger share sets, search readable content for credentials and configuration files:
+Search larger share sets:
 
 ```bash
 nxc smb <subnet> -u <user> -p '<password>' -M spider_plus
@@ -56,4 +56,4 @@ nxc smb <dc-ip> -u <user> -p '<password>' -M gpp_password
 nxc ldap <dc-ip> -u <user> -p '<password>' -M laps
 ```
 
-If `SYSVOL` contains a Group Policy Preferences `cpassword`, use `gpp-decrypt <cpassword>` on the recovered value. Keep the source share and path with the result. A writable extension, startup script, or application plug-in path matters only when a privileged process loads it.
+GPP `cpassword`: `gpp-decrypt <cpassword>`. Writable script/plugin needs a privileged load trigger.

