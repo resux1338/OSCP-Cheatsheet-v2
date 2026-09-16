@@ -20,5 +20,6 @@ Pick the row matching the input; compare against a normal request.
 | Browser-rendered input | Find the output context and check whether the browser executes it. | [XSS](web/xss.md) |
 | Known app or path filter | Check version, plugins, default access, and path normalization. | [Application paths](web/application-paths.md) |
 | Public PoC | Match the exact version and read the code before running or compiling it. | [Public exploits](foothold/public-exploits.md) |
+| User opens delivered content | Confirm a real delivery path, client action, and reachable callback. | [Client-side attacks and phishing](web/client-side-phishing.md) |
 
 After code execution: `id`/`whoami` → [shell](foothold/shells.md) · [payload](foothold/shells.md#msfvenom-payloads) · [transfer](foothold/file-transfer.md).

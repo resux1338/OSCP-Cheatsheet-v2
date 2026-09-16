@@ -13,7 +13,7 @@ openssl s_client -starttls smtp -connect <target-ip>:587 -crlf -quiet
 openssl s_client -connect <target-ip>:465 -crlf -quiet
 ```
 
-SMTP: STARTTLS on 25/587; implicit TLS on 465. `EHLO` lists extensions; `530` at `RCPT TO` means authenticate.
+SMTP: check whether STARTTLS is advertised on 25/587; 465 commonly uses implicit TLS. `EHLO` lists extensions. A `530` at `RCPT TO` means this transaction needs authentication at that point, but recipient checks may also be possible before authentication.
 
 ```text
 EHLO <domain.tld>
@@ -25,11 +25,12 @@ Known credentials; stop before `DATA`:
 
 ```bash
 swaks --server <target-ip> --auth LOGIN \
-  --auth-user '<user@domain.tld>' --auth-password '<password>' \
+  --auth-user '<user@domain.tld>' --auth-password \
+  --protect-prompt --auth-hide-password \
   --from '<user@domain.tld>' --to '<test@domain.tld>' --quit-after RCPT
 ```
 
-`<-` denotes server reply; recipient policy may be generic.
+`<-` denotes server reply; recipient policy may be generic. `250` at `RCPT TO` is not proof of a real inbox or delivery. See [client-side/phishing delivery](../web/client-side-phishing.md) for an authenticated send and stop conditions.
 
 ## IMAP: 143, 993
 
