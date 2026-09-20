@@ -2,6 +2,14 @@
 
 Offline OSCP command lookup. Check the current [OffSec exam guide](https://help.offsec.com/hc/en-us/articles/360040165632-OSCP-Exam-Guide) before the exam.
 
+Got a shell or domain credential? Check the low-hanging fruit first:
+
+| Access | First enumeration pass |
+| --- | --- |
+| Domain credential or domain-joined host | [Active Directory enumeration](ad/active-directory-enum.md) |
+| Windows shell | [Windows host enumeration](windows/windows-host-enum.md) |
+| Linux shell | [Linux enumeration](linux/linux-enum.md) |
+
 Pick a phase:
 
 | Phase | Quick reference |

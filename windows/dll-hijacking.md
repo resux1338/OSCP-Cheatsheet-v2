@@ -12,6 +12,18 @@ Get-ScheduledTask | Select-Object TaskName,Actions,Principal
 icacls 'C:\Path\To\Application'
 ```
 
+On Kali, inspect a copy of the executable for UTF-16LE DLL names. Windows
+programs may store a `LoadLibrary` argument this way, so an ASCII-only
+`strings` pass can miss it:
+
+```bash
+strings -a -e l scheduler.exe | rg -i '\.dll'
+```
+
+Replace `scheduler.exe` with the executable under review. The output is a
+candidate list, not proof that a DLL is missing or loaded from a writable path.
+Confirm the exact request at runtime.
+
 Procmon: filter `CreateFile` by process and missing DLL path; confirm the writable directory is searched first.
 
 Known service/task when broad enumeration is restricted:

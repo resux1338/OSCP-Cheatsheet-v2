@@ -18,7 +18,7 @@ nmap -Pn -p- -T3 "$IP"
 | Anonymous files | Try one anonymous or guest login; list readable shares, exports, or directories. | [SMB](enum/smb.md) · [FTP](enum/ftp.md) · [NFS](enum/nfs.md) |
 | Information in a service | Check SNMP output, mail capabilities, and unauthenticated RPC for names or paths. | [SNMP](enum/snmp.md) · [Mail](enum/mail.md) · [Other services](enum/other-services.md) |
 | Database or cache | Test a discovered account, then inspect its role and accessible data. | [Databases and Redis](enum/databases-and-redis.md) |
-| Web app | Read source and JavaScript, map paths, and compare virtual hosts before testing input. | [Web enumeration](web/web-enumeration.md) · [Foothold](02-foothold.md) |
+| Web app | Read source and JavaScript, map paths, and compare virtual hosts before testing input. | [Web enumeration](web/web-enumeration.md) · [Fingerprinting](web/fingerprinting.md) · [Foothold](02-foothold.md) |
 | Remote login | Test a known account against the matching service and account scope. | [RDP and WinRM](enum/remote-access.md) |
 | Domain controller | Resolve the full domain name and check LDAP, SMB, and Kerberos. | [AD](05-active-directory.md) |
 

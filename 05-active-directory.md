@@ -4,6 +4,8 @@
 
 Record domain, DC, credential; for each path, account + right + target + service.
 
+Start with the [Active Directory low-hanging-fruit enumeration](ad/active-directory-enum.md) page.
+
 | Possible path | Quick fit check | Details |
 | --- | --- | --- |
 | First domain picture | Can the account list users, groups, shares, hosts, and policy? | [LDAP and sessions](ad/ldap-and-sessions.md) · [BloodHound](ad/bloodhound.md) |

@@ -19,6 +19,7 @@ Read-only enumeration helpers. [Find-ExecutableReferences.ps1](Find-ExecutableRe
 ./scripts/kickoff 10.10.10.5
 ./scripts/kickoff dc01.lab.local -f targets.txt --username alice --domain lab.local --password 'example-password'
 ./scripts/kickoff targets.txt --creds-file ./creds.conf --udp-top-ports 100
+./scripts/kickoff targets.txt --password-file ./logins.txt --domain lab.local
 ./scripts/kickoff 10.10.10.5 --proxychains --proxychains-config ./proxychains.conf
 ./scripts/kickoff 10.10.10.5 --domain lab.local --udp-top-ports 100 --extras
 ./scripts/kickoff 10.10.10.5 --web-pages
@@ -32,24 +33,44 @@ domain=lab.local
 password=example-password
 ```
 
-Credential options: `--creds-file`, `--password-file`, or password prompt. Direct `--password` appears in history/process list. Raw NXC logs can contain credentials.
+`--creds-file` supplies one key/value credential set. `--password-file` tries multiple logins, one per line; blank lines and `#` comments are ignored. The first colon is the separator, so additional colons remain part of the password:
+
+```text
+bob:Password1!
+alice:a-password:with-colons
+```
+
+Use `--domain` with a password list when needed. Direct `--password` appears in history/process listings. Raw NXC logs can contain credentials.
 
 Resume/rerun:
 
 ```bash
 ./scripts/kickoff --resume kickoff-results/20260912-120000
 ./scripts/kickoff --resume kickoff-results/20260912-120000 --rerun nxc --creds-file ./new-creds.conf
+./scripts/kickoff --resume kickoff-results/20260912-120000 172.16.20.10
 ```
 
 `--rerun nmap|nxc|whatweb|web|extras`; use `--rerun nxc` after changing a password. Skip stages with `--skip-nxc`, `--skip-whatweb`, `--skip-ad-followup`, `--skip-web-followup`.
 
+Supplying one host with `--resume` scans that host and adds it to the run. Register a known host without trying to reach it, then add scan results later when a pivot is available:
+
+```bash
+./scripts/kickoff --resume kickoff-results/20260912-120000 --add-host 172.16.20.12
+./scripts/kickoff --resume kickoff-results/20260912-120000 172.16.20.12 --proxychains
+```
+
 Reports:
 
 ```bash
-kickoff --report-only kickoff-results/20260912-120000
+./scripts/kickoff --report-only kickoff-results/20260912-120000
+./scripts/kickoff --serve
 ```
 
-Open `report.html`; per-host `summary.md` contains raw NXC output/log paths and may contain credentials. `hosts.suggested` contains the discovered hosts-file line.
+Open the printed `http://127.0.0.1:8765/` URL. The scan manager lists every run under `kickoff-results/`, starts new scans, resumes runs, and shows live scan activity, including `kickoff` scans started in another terminal under the same results root. Use `--serve -o another-results-dir` to manage another results root.
+
+Open a run to add hosts one at a time and mark machines pwned. Optional machine name, subnet, and pivot/source fields retain hosts learned from internal networks even when they cannot be scanned. If a lab reboot moves an entire network, use **Lab subnet changed?** with equal-sized CIDRs such as `192.168.141.0/24` and `192.168.107.0/24`. This preserves host numbers while updating scan targets, inventory hosts, subnet/pivot metadata, and saved scan folders. Resume the run afterward to refresh results from the new addresses.
+
+Server detail panels below the searchable table start collapsed; use each server heading or the expand/collapse-all buttons. Each panel has **Server** and **Notes** tabs. Notes entered in the browser are stored per host in `inventory.json` and included safely in the generated report. A directly opened `report.html` remains a view-only snapshot. Per-host `summary.md` contains raw NXC output/log paths and may contain credentials. `hosts.suggested` contains the discovered hosts-file line.
 
 Web: headers by default; `--web-pages` also fetches `/`, `/robots.txt`, `/sitemap.xml`; `--web-max-names N` changes hostname cap. `--extras` adds DNS, RPC/NFS, SNMP checks where ports match.
 

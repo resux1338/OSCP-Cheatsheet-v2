@@ -4,6 +4,8 @@
 
 Run baseline; confirm the privilege, writable target, and trigger for each lead.
 
+Start with the [Linux low-hanging-fruit enumeration](linux/linux-enum.md) page.
+
 ```bash
 id; sudo -l; uname -r; cat /etc/os-release
 ```

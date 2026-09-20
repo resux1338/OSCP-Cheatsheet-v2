@@ -4,6 +4,8 @@
 
 Map each open port to a focused check; retain names, versions, and credential used.
 
+For a repeatable product and version check, use the [fingerprinting workflow](../web/fingerprinting.md).
+
 | Port | Topic | First check |
 | --- | --- | --- |
 | 21 | [FTP](ftp.md) | Anonymous access and readable files |

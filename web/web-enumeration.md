@@ -4,6 +4,8 @@
 
 Use discovered hostname for Host/SNI. Check source, JS, `robots.txt`, `sitemap.xml`, backups.
 
+For product and version clues, follow the [web fingerprinting workflow](fingerprinting.md).
+
 ```bash
 whatweb http://<target-ip>
 curl -sI http://<target-ip>

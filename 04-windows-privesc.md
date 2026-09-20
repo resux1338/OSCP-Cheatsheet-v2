@@ -4,6 +4,8 @@
 
 Token/build first; then exact right, writable path, and trigger.
 
+Start with the [Windows low-hanging-fruit enumeration](windows/windows-host-enum.md) page.
+
 ```powershell
 whoami /all
 systeminfo
