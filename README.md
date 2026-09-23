@@ -14,6 +14,7 @@ Pick a phase:
 
 | Phase | Quick reference |
 | --- | --- |
+| Methodology / assessment flow | [00-methodology.md](00-methodology.md) |
 | Recon and enumeration | [01-recon.md](01-recon.md) |
 | Foothold, shells, and web | [02-foothold.md](02-foothold.md) |
 | Linux privilege escalation | [03-linux-privesc.md](03-linux-privesc.md) |

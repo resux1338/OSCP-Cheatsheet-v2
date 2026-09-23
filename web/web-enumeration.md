@@ -32,3 +32,5 @@ joomscan -u http://<target>
 ```
 
 Check `.git/`, backup extensions, and JS for endpoints/credentials. Confirm scanner hits manually.
+
+Keep a list of functions, parameters, and roles from real requests. Compare normal and changed responses; repeat path and function checks after login or a role change. [Input and access checks](../02-foothold.md).

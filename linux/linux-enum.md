@@ -135,7 +135,7 @@ Inspect a script and its version before running it. OffSec permits automatic enu
 ## References
 
 - [g0tmi1k: Basic Linux Privilege Escalation](https://blog.g0tmi1k.com/2011/08/basic-linux-privilege-escalation/)
-- [HackTricks Linux privilege-escalation checklist](https://book.hacktricks.wiki/en/linux-hardening/checklist-linux-privilege-escalation.html)
+- [HackTricks Linux privilege-escalation checklist](https://hacktricks.wiki/en/linux-hardening/main-system-information/linux-privilege-escalation-checklist.html)
 - [0xNeel: OSCP privilege-escalation enumeration checklist](https://0xneel.medium.com/privilege-escalation-enumeration-checklist-2d995e9ddfe7)
 - [FalconSpy: OSCP methodology](https://falconspy.medium.com/oscp-developing-a-methodology-32f4ab471fd6)
 - [PEASS-ng linPEAS](https://github.com/peass-ng/PEASS-ng/tree/master/linPEAS)
