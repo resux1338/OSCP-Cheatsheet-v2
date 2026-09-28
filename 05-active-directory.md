@@ -12,6 +12,7 @@ Start with the [Active Directory low-hanging-fruit enumeration](ad/active-direct
 | Roastable account | Is pre-auth disabled or is a user-backed SPN present? Check lockout before online tests. | [Authentication](ad/authentication.md) |
 | Useful object right | Identify the principal, exact ACL right, target, and original state. | [Object rights](ad/object-rights.md) · [SPNs and ACLs](ad/spn-acl-shares.md) |
 | Share or SYSVOL lead | Can you read credentials or write content a privileged process actually loads? | [Shares and SPNs](ad/spn-acl-shares.md) |
+| MSSQL access | Check SQL vs Windows login, effective role, impersonation, and linked-server mappings. | [MSSQL](ad/mssql.md) |
 | Session or admin edge | Does the account have local admin rights where a useful session or service exists? | [Sessions](ad/ldap-and-sessions.md#hosts-and-sessions) · [Lateral movement](ad/lateral-movement.md) |
 | GPO edge | Check the exact GPO right, linked scope, and affected host or user. | [GPOs](ad/gpo-edges.md) |
 | AD CS | Is an enrollment service present, and can this account enroll in a relevant template? | [AD CS](ad/adcs.md) |
@@ -19,6 +20,6 @@ Start with the [Active Directory low-hanging-fruit enumeration](ad/active-direct
 | Ticket material | Match the key or ticket to its account, SPN, service, and domain. | [Tickets](ad/tickets.md) |
 | Kerberos fails | Check FQDN, DNS, clock skew, SPN, and the ticket cache. | [Kerberos checks](ad/kerberos-troubleshooting.md) |
 | Login but no execution | Check local admin rights and whether the matching remote service is open. | [Lateral movement](ad/lateral-movement.md) |
-| Advanced object path | Check prerequisite rights and DC support before changing an object. | [Advanced object paths](ad/object-rights.md#sealed-ldap-object-restore-newer-primitives) |
+| Advanced object path | Check prerequisite rights and DC support before changing an object. | [Advanced object paths](ad/object-rights.md#sealed-ldap-object-restore--newer-primitives) |
 
 After new credentials, re-enumerate with that account. Confirm BloodHound rights on the target.

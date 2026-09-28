@@ -43,6 +43,8 @@ impacket-ticketer -nthash <krbtgt_NT> -domain-sid <SID> -domain corp.local admin
 ```
 > Silver: confirm SPN ↔ account; use `-aesKey <aes256>` when AES is required. Golden: needs `krbtgt` key.
 
+MSSQL ticket accepted? Check the resulting login and role in [MSSQL enumeration](mssql.md#identity-and-rights).
+
 ## Delegation
 ```bash
 # Constrained (TRUSTED_TO_AUTH_FOR_DELEGATION): impersonate via S4U

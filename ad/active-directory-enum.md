@@ -153,6 +153,7 @@ Get-UnattendedInstallFile
 | --- | --- | --- |
 | Password or clue in a user description | Account state, scope, and lockout policy | [Authentication](authentication.md) |
 | User-backed SPN or pre-auth disabled | Exact account, SPN, encryption, and policy | [Authentication](authentication.md) |
+| MSSQL SPN, listener, or connection string | Instance/port, login type, effective SQL rights, and linked-server mappings | [MSSQL](mssql.md) |
 | Readable share or SYSVOL file | File contents, intended reader, and credential scope | [Shares and SPNs](spn-acl-shares.md) |
 | Local-admin access or useful session | Target host, service, account scope, and route | [LDAP and sessions](ldap-and-sessions.md) · [Lateral movement](lateral-movement.md) |
 | Interesting object ACL | Principal, exact right, target, inheritance, and current state | [Object rights](object-rights.md) |

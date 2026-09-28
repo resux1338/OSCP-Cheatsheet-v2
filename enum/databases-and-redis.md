@@ -50,7 +50,7 @@ SELECT IS_SRVROLEMEMBER('sysadmin');
 EXEC sp_linkedservers;
 ```
 
-MSSQL: use `-windows-auth` only for Windows login. [`xp_cmdshell` checks](../web/manual-sqli.md#mssql-string-context).
+MSSQL: use `-windows-auth` only for Windows login. [MSSQL enumeration and AD paths](../ad/mssql.md): SQL/Windows login, data, impersonation, linked servers, `xp_cmdshell`, and service-account follow-up. [SQLi context](../web/manual-sqli.md#mssql-string-context).
 
 ## Redis: 6379
 
