@@ -15,11 +15,12 @@ Pick the row matching the input; compare against a normal request.
 | Server fetches a URL | Submit a unique callback URL and check your listener. | [SSRF](web/ssrf.md) |
 | XML parser | Check whether a controlled entity changes the parsed result. | [XXE](web/xxe.md) |
 | Serialized value | Identify the format and the server-side parser before choosing a payload. | [Insecure deserialization](web/insecure-deserialization.md) |
-| API or auth boundary | Change one object ID, role, or parameter; compare access as another user. | [Auth and NoSQL](web/auth-and-template.md) · [GraphQL](web/graphql.md) |
-| JWT | Decode header and payload; only a server-accepted change proves a weakness. | [JWT](web/auth-and-template.md#jwt) |
+| API or auth boundary | Change one object ID, role, or parameter; compare access as another user. | [Authentication and access control](web/authentication.md) · [GraphQL](web/graphql.md) |
+| NoSQL query input | Compare a literal value with an operator in the same request format. | [NoSQL injection](web/nosql.md) |
+| JWT | Decode header and payload; only a server-accepted change proves a weakness. | [JWT](web/authentication.md#jwt) |
 | Browser-rendered input | Find the output context and check whether the browser executes it. | [XSS](web/xss.md) |
 | Known app or path filter | Check version, plugins, default access, and path normalization. | [Application paths](web/application-paths.md) |
 | Public PoC | Match the exact version and read the code before running or compiling it. | [Public exploits](foothold/public-exploits.md) |
-| User opens delivered content | Confirm a real delivery path, client action, and reachable callback. | [Client-side attacks and phishing](web/client-side-phishing.md) |
+| User opens delivered content | Confirm a real delivery path, client action, and reachable callback. | [Client-side attacks and phishing](foothold/client-side-phishing.md) |
 
 After code execution: `id`/`whoami` → [shell](foothold/shells.md) · [payload](foothold/shells.md#msfvenom-payloads) · [transfer](foothold/file-transfer.md).

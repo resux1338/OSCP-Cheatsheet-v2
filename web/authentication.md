@@ -1,4 +1,4 @@
-# Web auth, NoSQL, and JWT
+# Web authentication and access control
 
 [← Foothold quick reference](../02-foothold.md)
 
@@ -17,20 +17,6 @@ Keep each login attempt tied to its own browser session. For OAuth/OIDC, record 
 For SAML, inspect the response's signature, issuer, destination/recipient, audience, timestamps, and `InResponseTo` against the request and service provider. If `RelayState` contains a URL, test its allowlist; a changed `RelayState` by itself does not prove authentication bypass. Prefer a second controlled account or service-provider endpoint to demonstrate a real boundary failure. If you cannot inspect or replay a complete flow, record the observation and move on.
 
 References: [OAuth 2.0 Security BCP](https://datatracker.ietf.org/doc/html/rfc9700) · [OWASP SAML Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/SAML_Security_Cheat_Sheet.html).
-
-## NoSQL operators
-
-If input is Mongo-backed, compare literal values with operators:
-
-```text
-{"user":{"$ne":null},"pass":{"$ne":null}}
-user[$ne]=x&pass[$ne]=x
-user[$regex]=^admin
-```
-
-## Server-side templates
-
-[SSTI checks and payloads](ssti.md).
 
 ## JWT
 

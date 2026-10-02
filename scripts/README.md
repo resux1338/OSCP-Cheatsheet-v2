@@ -1,77 +1,34 @@
 # Scripts
 
-Read-only enumeration helpers. [Find-ExecutableReferences.ps1](Find-ExecutableReferences.ps1) searches visible services, tasks, and processes for an executable name or path.
+[← Repository index](../README.md)
 
-## LFI enumeration
+Two helpers are published with this cheatsheet:
 
-[`lfi-enum`](lfi-enum) tries a short file list at depths 0–6 and saves every curl response. Put `FUZZ` where the file path belongs; inspect `results.tsv` and the `.body` files. [LFI notes](../web/lfi.md).
+| Helper | Purpose | Related notes |
+| --- | --- | --- |
+| [Find-ExecutableReferences.ps1](Find-ExecutableReferences.ps1) | Finds visible services, scheduled tasks, and processes that reference an executable filename or path. | [DLL hijacking checks](../windows/dll-hijacking.md) |
+| [vba_chunks.py](vba_chunks.py) | Splits a UTF-16LE Base64 PowerShell command into VBA string assignments. | [Office VBA delivery](../foothold/client-side-phishing.md#office-vba-document) |
+
+## Find executable references
+
+Run the PowerShell helper from the directory containing the downloaded file:
+
+```powershell
+.\Find-ExecutableReferences.ps1 'custom.exe'
+.\Find-ExecutableReferences.ps1 'C:\Path\To\custom.exe'
+```
+
+It reads services, tasks, and process metadata. It does not execute the named file or change a service or task. Access restrictions can hide results; an empty result does not rule out a reference.
+
+## VBA command chunks
+
+Requires Python 3 and its standard library. From the repository root:
 
 ```bash
-./scripts/lfi-enum -u 'http://<target>/index.php?page=FUZZ'
-./scripts/lfi-enum -u 'http://<target>/index.php?page=FUZZ' -w ./paths.txt -d 8 -b ./cookies.txt
+python3 scripts/vba_chunks.py
+python3 scripts/vba_chunks.py '<UTF-16LE-BASE64-COMMAND>'
 ```
 
-## Kickoff recon
+Omit the argument to paste the encoded command when prompted, or pipe it on standard input. The helper validates the encoding and prints `cmd = cmd & "..."` assignments for the VBA example in the linked delivery notes.
 
-[`kickoff`](kickoff): full TCP connect scan → version/safe scripts → service-specific NXC, WhatWeb, and web checks. Output streams to screen and dated `kickoff-results/` directory.
-
-```bash
-./scripts/kickoff 10.10.10.5
-./scripts/kickoff dc01.lab.local -f targets.txt --username alice --domain lab.local --password 'example-password'
-./scripts/kickoff targets.txt --creds-file ./creds.conf --udp-top-ports 100
-./scripts/kickoff targets.txt --password-file ./logins.txt --domain lab.local
-./scripts/kickoff 10.10.10.5 --proxychains --proxychains-config ./proxychains.conf
-./scripts/kickoff 10.10.10.5 --domain lab.local --udp-top-ports 100 --extras
-./scripts/kickoff 10.10.10.5 --web-pages
-```
-
-Targets: IPs/hostnames separated by whitespace or commas; `#` comments. Credentials file:
-
-```text
-username=alice
-domain=lab.local
-password=example-password
-```
-
-`--creds-file` supplies one key/value credential set. `--password-file` tries multiple logins, one per line; blank lines and `#` comments are ignored. The first colon is the separator, so additional colons remain part of the password:
-
-```text
-bob:Password1!
-alice:a-password:with-colons
-```
-
-Use `--domain` with a password list when needed. Direct `--password` appears in history/process listings. Raw NXC logs can contain credentials.
-
-Resume/rerun:
-
-```bash
-./scripts/kickoff --resume kickoff-results/20260912-120000
-./scripts/kickoff --resume kickoff-results/20260912-120000 --rerun nxc --creds-file ./new-creds.conf
-./scripts/kickoff --resume kickoff-results/20260912-120000 172.16.20.10
-```
-
-`--rerun nmap|nxc|whatweb|web|extras`; use `--rerun nxc` after changing a password. Skip stages with `--skip-nxc`, `--skip-whatweb`, `--skip-ad-followup`, `--skip-web-followup`.
-
-Supplying one host with `--resume` scans that host and adds it to the run. Register a known host without trying to reach it, then add scan results later when a pivot is available:
-
-```bash
-./scripts/kickoff --resume kickoff-results/20260912-120000 --add-host 172.16.20.12
-./scripts/kickoff --resume kickoff-results/20260912-120000 172.16.20.12 --proxychains
-```
-
-Reports:
-
-```bash
-./scripts/kickoff --report-only kickoff-results/20260912-120000
-./scripts/kickoff --serve
-```
-
-Open the printed `http://127.0.0.1:8765/` URL. The scan manager lists every run under `kickoff-results/`, starts new scans, resumes runs, and shows live scan activity, including `kickoff` scans started in another terminal under the same results root. Use `--serve -o another-results-dir` to manage another results root.
-
-Open a run to add hosts one at a time and mark machines pwned. Optional machine name, subnet, and pivot/source fields retain hosts learned from internal networks even when they cannot be scanned. If a lab reboot moves an entire network, use **Lab subnet changed?** with equal-sized CIDRs such as `192.168.141.0/24` and `192.168.107.0/24`. This preserves host numbers while updating scan targets, inventory hosts, subnet/pivot metadata, and saved scan folders. Resume the run afterward to refresh results from the new addresses.
-
-Server detail panels below the searchable table start collapsed; use each server heading or the expand/collapse-all buttons. Each panel has **Server** and **Notes** tabs. Notes entered in the browser are stored per host in `inventory.json` and included safely in the generated report. A directly opened `report.html` remains a view-only snapshot. Per-host `summary.md` contains raw NXC output/log paths and may contain credentials. `hosts.suggested` contains the discovered hosts-file line.
-
-Web: headers by default; `--web-pages` also fetches `/`, `/robots.txt`, `/sitemap.xml`; `--web-max-names N` changes hostname cap. `--extras` adds DNS, RPC/NFS, SNMP checks where ports match.
-
-Proxy: `--proxychains --proxychains-config <file>` wraps TCP tools. Use IPs when proxy DNS is unavailable. UDP scanning is rejected in proxy mode; full TCP scan may be slow.
+Additional tools remain local while awaiting OffSec review.

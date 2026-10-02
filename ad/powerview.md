@@ -296,7 +296,7 @@ Find-DomainShare -ComputerName $Targets -CheckShareAccess -Threads 1 @Net -Verbo
 
 Rerun denied shares + promising ACLs/hosts. Rebuild `$PrincipalSids` in [ACL checks](#object-acls).
 
-Changed group membership → fresh logon. Local admin/SYSTEM → [credential access](credential-access.md).
+Changed group membership → fresh logon. Local admin/SYSTEM → [Windows credential access](../windows/credential-access.md).
 
 ### Delegation
 

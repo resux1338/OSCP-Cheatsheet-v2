@@ -7,8 +7,8 @@ Got a shell or domain credential? Check the low-hanging fruit first:
 | Access | First enumeration pass |
 | --- | --- |
 | Domain credential or domain-joined host | [Active Directory enumeration](ad/active-directory-enum.md) |
-| Windows shell | [Windows host enumeration](windows/windows-host-enum.md) |
-| Linux shell | [Linux enumeration](linux/linux-enum.md) |
+| Windows shell | [Windows host enumeration](windows/enumeration.md) |
+| Linux shell | [Linux enumeration](linux/enumeration.md) |
 
 Pick a phase:
 
@@ -25,4 +25,4 @@ Pick a phase:
 
 Replace `<TARGET-IP>` and `<KALI-IP>`; check local tool help for version-specific flags.
 
-Read-only helpers are in [scripts/](scripts/README.md).
+Helpers for executable references and VBA command chunks are in [scripts/](scripts/README.md).

@@ -137,6 +137,6 @@ smb: \> put Documents.Library-ms
 
 If the library is opened but there is no WebDAV request, troubleshoot reachability and client handling; if WebDAV is reached but there is no callback, check whether the shortcut was opened and whether its command or egress was blocked. A WebDAV request alone is not code execution.
 
-OAuth/SAML and access-control checks from the source note live on the [web auth page](auth-and-template.md#oauth-oidc-and-saml-flows); they are distinct from phishing delivery.
+OAuth/SAML and access-control checks from the source note live on the [web auth page](../web/authentication.md#oauth-oidc-and-saml-flows); they are distinct from phishing delivery.
 
 References: [Swaks reference](https://www.jetmore.org/john/code/swaks/files/swaks-20240103.0/doc/ref.txt) · [Word auto macros](https://learn.microsoft.com/en-us/office/vba/word/concepts/customizing-word/auto-macros) · [Word `Document.Open`](https://learn.microsoft.com/en-us/office/vba/api/word.document.open) · [Microsoft macro blocking](https://learn.microsoft.com/en-us/microsoft-365-apps/security/internet-macros-blocked) · [WsgiDAV](https://github.com/mar10/wsgidav).

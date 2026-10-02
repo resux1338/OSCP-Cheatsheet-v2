@@ -36,7 +36,7 @@
 ## Shell reset / privesc
 
 - [ ] `id` / `whoami`; hostname, groups/token, interfaces/routes, loopback listeners.
-- [ ] Users, processes/services, configs, history, creds, writable paths, reachable hosts. [Linux](linux/linux-enum.md) · [Windows](windows/windows-host-enum.md)
+- [ ] Users, processes/services, configs, history, creds, writable paths, reachable hosts. [Linux](linux/enumeration.md) · [Windows](windows/enumeration.md)
 - [ ] Domain-joined? Run [AD baseline](ad/active-directory-enum.md).
 - [ ] Prove: `privileged component → controlled file/input/right → trigger`. Check permissions before changes.
 - [ ] Linux: `user → controlled component → root-run process → trigger`. Windows: `account → right → target → privileged trigger`.

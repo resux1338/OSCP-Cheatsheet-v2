@@ -163,7 +163,17 @@ Automated output is a lead list, not proof. Use current copies, save the output,
 .\Seatbelt.exe -group=all
 ```
 
-Map the exact Windows build only after the misconfiguration checks. Kernel or local CVE matching is a later step because patch detection and exploit applicability can be wrong.
+Map the exact Windows build only after the misconfiguration checks. Kernel or local CVE matching is a later step because patch detection and exploit applicability can be wrong. `wesng.py` can sort leads from saved `systeminfo` output; confirm the exact patch level yourself.
+
+## Tool troubleshooting
+
+If a transferred tool fails, compare its checksum with the source copy, then check its runtime, architecture, and local protection status.
+
+```powershell
+Get-FileHash '<TRANSFERRED-FILE>' -Algorithm SHA256
+[System.Environment]::Version
+Get-MpComputerStatus
+```
 
 ## Triage the findings
 

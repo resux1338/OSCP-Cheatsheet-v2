@@ -4,7 +4,7 @@
 
 Token/build first; then exact right, writable path, and trigger.
 
-Start with the [Windows low-hanging-fruit enumeration](windows/windows-host-enum.md) page.
+Start with the [Windows low-hanging-fruit enumeration](windows/enumeration.md) page.
 
 ```powershell
 whoami /all
@@ -21,7 +21,7 @@ systeminfo
 | DLL load | Find the actual missing or writable DLL path and a trigger. | [DLL hijacking](windows/dll-hijacking.md) |
 | Task or installer | Check the run-as account, writable action, trigger, or both installer policy values. | [Tasks and installer](windows/services.md) |
 | Credential or saved logon | Check stored credentials, targeted config files, history, and allowed logon method. | [Credential checks](windows/credentials.md) |
-| Local hash material | Distinguish an NT hash from a challenge-response before trying reuse. | [NT hashes](windows/ntlm.md) |
-| Tool blocked or missing | Check the file, runtime, and Defender status before changing your approach. | [Host baseline](windows/host-enumeration.md) |
+| Local hash material | Confirm extraction rights; distinguish an NT hash from a challenge-response before trying reuse. | [Credential access](windows/credential-access.md) · [NT hashes](windows/ntlm.md) |
+| Tool blocked or missing | Check the file, runtime, and Defender status before changing your approach. | [Tool troubleshooting](windows/enumeration.md#tool-troubleshooting) |
 
-[Host enumeration](windows/host-enumeration.md) collects the wider baseline. Verify a finding with the host's own ACLs and service state before replacing anything.
+Verify a finding with the host's own ACLs and service state before replacing anything.

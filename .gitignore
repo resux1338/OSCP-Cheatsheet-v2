@@ -1,1 +1,9 @@
-/scripts/kickoff
+# Keep unpublished tools local; publish only these helpers and their index.
+/scripts/*
+!/scripts/README.md
+!/scripts/Find-ExecutableReferences.ps1
+!/scripts/vba_chunks.py
+
+# Verification for the unpublished tools stays local too.
+/tests/
+__pycache__/

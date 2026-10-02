@@ -42,7 +42,7 @@ No visible value: compare true/false, then repeat a delayed MySQL request agains
 
 ## MSSQL string context
 
-Direct SQL access: [MSSQL enumeration and AD paths](../ad/mssql.md).
+Direct SQL access: [MSSQL enumeration and access](../enum/mssql.md).
 
 Pick the prefix that fits the input: string `';`, numeric `1;`, or parenthesized `');`.
 

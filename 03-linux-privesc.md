@@ -4,7 +4,7 @@
 
 Run baseline; confirm the privilege, writable target, and trigger for each lead.
 
-Start with the [Linux low-hanging-fruit enumeration](linux/linux-enum.md) page.
+Start with the [Linux low-hanging-fruit enumeration](linux/enumeration.md) page.
 
 ```bash
 id; sudo -l; uname -r; cat /etc/os-release
@@ -19,7 +19,7 @@ id; sudo -l; uname -r; cat /etc/os-release
 | Privileged file write | Check whether a root process follows a path or archive entry you control. | [File-write paths](linux/file-write.md) |
 | Docker or LXD | Confirm group membership and access to a rootful daemon socket. | [Groups and containers](linux/groups-and-nfs.md) |
 | NFS export | Check the export, client access, write permission, and root squashing. | [NFS](linux/groups-and-nfs.md#nfs) |
-| Saved credential | Search targeted configs, history, backups, and local-only services. | [Host checks](linux/host-checks.md) |
+| Saved credential | Search targeted configs, history, backups, and local-only services. | [Credential checks](linux/enumeration.md#users-homes-and-credentials) |
 | Restricted shell | Test whether an allowed interpreter or command can start a normal shell. | [Restricted shells](linux/restricted-shells.md) |
 | Kernel or package issue | Match the exact build, architecture, and patch state after local paths fail. | [Kernel checks](linux/kernel-checks.md) |
 

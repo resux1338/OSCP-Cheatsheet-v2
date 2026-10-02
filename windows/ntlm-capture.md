@@ -1,6 +1,6 @@
 # Net-NTLM capture with `ntlm_theft`
 
-[← NT hashes and NetNTLMv2](ntlm.md) · [Client-side delivery](../web/client-side-phishing.md) · [Password quick reference](../07-password-attacks.md)
+[← NT hashes and NetNTLMv2](ntlm.md) · [Client-side delivery](../foothold/client-side-phishing.md) · [Password quick reference](../07-password-attacks.md)
 
 This is a client-authentication path, not local hash dumping. An NT hash from SAM/LSASS and a captured Net-NTLMv2 challenge-response are different materials: the latter is for offline cracking (`hashcat -m 5600`), **not** Pass the Hash.
 
@@ -32,7 +32,7 @@ sudo responder -I <vpn-interface> -A
 sudo ss -ltn '( sport = :445 )'
 ```
 
-Deliver only the chosen file through an in-scope upload, share, or [mail path](../web/client-side-phishing.md#authenticated-smtp-delivery). Observe a connection and a captured `user::domain:...` response in Responder's output/logs. If there is no connection, distinguish “not opened/processed” from “network blocked” before trying another file type. If outbound SMB is blocked, stop cycling through SMB-based files. A machine-account response may not be useful for the intended foothold.
+Deliver only the chosen file through an in-scope upload, share, or [mail path](../foothold/client-side-phishing.md#authenticated-smtp-delivery). Observe a connection and a captured `user::domain:...` response in Responder's output/logs. If there is no connection, distinguish “not opened/processed” from “network blocked” before trying another file type. If outbound SMB is blocked, stop cycling through SMB-based files. A machine-account response may not be useful for the intended foothold.
 
 ```bash
 hashcat -m 5600 netntlmv2.txt /usr/share/wordlists/rockyou.txt

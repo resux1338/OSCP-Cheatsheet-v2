@@ -27,6 +27,7 @@ getent group
 w
 last -n 20
 ls -la /home /home/* /opt /srv /var/www /var/backups 2>/dev/null
+find /var/backups /opt /srv /var/www -maxdepth 3 -type f 2>/dev/null
 ```
 
 Search likely application and user locations, not the entire filesystem first.
@@ -82,7 +83,7 @@ systemd-detect-virt 2>/dev/null
 cat /proc/1/cgroup 2>/dev/null
 ```
 
-A loopback listener may expose a management interface, database, or reused credential. A container socket or privileged group is only a lead until its daemon and permissions are confirmed. See [groups, containers, and NFS](groups-and-nfs.md).
+A loopback listener may expose a management interface, database, or reused credential. Confirm the port and owning process, then [forward the service](../06-pivoting.md) for inspection. A container socket or privileged group is only a lead until its daemon and permissions are confirmed. See [groups, containers, and NFS](groups-and-nfs.md).
 
 ## SUID, SGID, and capabilities
 
@@ -129,7 +130,7 @@ Inspect a script and its version before running it. OffSec permits automatic enu
 | Writable privileged destination | Whether the privileged process follows or overwrites that path | [File-write paths](file-write.md) |
 | Docker, LXD, or privileged socket | Group membership, socket ACL, and rootful daemon | [Groups and containers](groups-and-nfs.md) |
 | NFS mount or export | Client access, write permission, UID behavior, and root squashing | [NFS](groups-and-nfs.md#nfs) |
-| Saved credential | Account, service, scope, and reuse | [Host checks](host-checks.md) |
+| Saved credential | Account, service, scope, and reuse | [Credential checks](#users-homes-and-credentials) |
 | Kernel or package candidate | Exact build, architecture, configuration, and patch state | [Kernel checks](kernel-checks.md) |
 
 ## References

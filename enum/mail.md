@@ -30,7 +30,7 @@ swaks --server <target-ip> --auth LOGIN \
   --from '<user@domain.tld>' --to '<test@domain.tld>' --quit-after RCPT
 ```
 
-`<-` denotes server reply; recipient policy may be generic. `250` at `RCPT TO` is not proof of a real inbox or delivery. See [client-side/phishing delivery](../web/client-side-phishing.md) for an authenticated send and stop conditions.
+`<-` denotes server reply; recipient policy may be generic. `250` at `RCPT TO` is not proof of a real inbox or delivery. See [client-side/phishing delivery](../foothold/client-side-phishing.md) for an authenticated send and stop conditions.
 
 ## IMAP: 143, 993
 

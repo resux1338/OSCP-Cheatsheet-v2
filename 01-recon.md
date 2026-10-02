@@ -4,6 +4,8 @@
 
 Full TCP scan → service checks. Record names, ports, and working credentials.
 
+Track reviewed hosts, services, websites, account contexts, and remaining work in your notes. Keep detailed findings in CherryTree and record the notebook/node reference beside each check.
+
 ```bash
 nmap -Pn -p- -T3 "$IP"
 ```

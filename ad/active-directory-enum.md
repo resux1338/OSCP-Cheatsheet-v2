@@ -76,7 +76,7 @@ Get-ChildItem "\\<DC-FQDN>\SYSVOL\<DOMAIN.TLD>\Policies" -Recurse -File -ErrorAc
 
 ## PowerView: prioritize useful fields
 
-PowerView performs domain enumeration; PowerUp in the next section checks the local Windows host.
+PowerView performs domain enumeration. Use the [full PowerView reference](powerview.md) for scoped queries, useful fields, and command aliases.
 
 ```powershell
 . .\PowerView.ps1
@@ -126,26 +126,9 @@ certipy find -u '<USER>@<DOMAIN.TLD>' -p '<PASSWORD>' -dc-ip <DC-IP> -vulnerable
 
 Verify every reported template setting and enrollment right in [AD CS template checks](adcs.md).
 
-## PowerUp: local enumeration only
+## Local Windows baseline
 
-Run this on each Windows foothold in the domain. These commands report local privilege-escalation leads; they do not enumerate AD objects.
-
-```powershell
-. .\PowerUp.ps1
-Invoke-PrivescAudit
-# Alias for the same audit in the PowerSploit version:
-Invoke-AllChecks
-
-Get-ProcessTokenPrivilege -Special
-Get-UnquotedService
-Get-ModifiableServiceFile
-Get-ModifiableService
-Get-RegistryAutoLogon
-Get-ModifiableScheduledTaskFile
-Get-UnattendedInstallFile
-```
-
-`Invoke-AllChecks` can display the name of a suggested abuse function, but it does not run that function. Keep this sheet to the audit commands above and verify every hit with native ACL, service, or task queries. See the full [Windows host enumeration](../windows/windows-host-enum.md#powerup-enumeration-only) checklist.
+On each Windows foothold, follow [Windows host enumeration](../windows/enumeration.md), including its [PowerUp audit checklist](../windows/enumeration.md#powerup-enumeration-only). These checks inspect the local host; repeat domain enumeration with any new credential.
 
 ## Triage the findings
 
@@ -153,7 +136,7 @@ Get-UnattendedInstallFile
 | --- | --- | --- |
 | Password or clue in a user description | Account state, scope, and lockout policy | [Authentication](authentication.md) |
 | User-backed SPN or pre-auth disabled | Exact account, SPN, encryption, and policy | [Authentication](authentication.md) |
-| MSSQL SPN, listener, or connection string | Instance/port, login type, effective SQL rights, and linked-server mappings | [MSSQL](mssql.md) |
+| MSSQL SPN, listener, or connection string | Instance/port, login type, effective SQL rights, and linked-server mappings | [MSSQL](../enum/mssql.md) |
 | Readable share or SYSVOL file | File contents, intended reader, and credential scope | [Shares and SPNs](spn-acl-shares.md) |
 | Local-admin access or useful session | Target host, service, account scope, and route | [LDAP and sessions](ldap-and-sessions.md) · [Lateral movement](lateral-movement.md) |
 | Interesting object ACL | Principal, exact right, target, inheritance, and current state | [Object rights](object-rights.md) |
@@ -171,20 +154,4 @@ Get-UnattendedInstallFile
 
 ## Where is the flag?
 
-Check the expected desktop locations first, then search the full drive if a flag is missing. Run the search in the privilege context that should be able to read the flag.
-
-```powershell
-Get-ChildItem 'C:\Users\*\Desktop\local.txt','C:\Users\*\Desktop\proof.txt' `
-    -Force -ErrorAction SilentlyContinue | Select-Object FullName
-
-Get-ChildItem -Path C:\ -Include local.txt,proof.txt -File -Recurse -Force `
-    -ErrorAction SilentlyContinue | Select-Object FullName
-```
-
-```cmd
-where /r C:\ local.txt 2>nul
-where /r C:\ proof.txt 2>nul
-type "<FLAG-PATH>"
-```
-
-On an AD set, record the hostname and full path with each flag so results from different members are not mixed together.
+Use the [Windows flag-location checks](../windows/enumeration.md#where-is-the-flag) in the privilege context that should be able to read the flag. On an AD set, record the hostname and full path with each value so results from different members are not mixed together.

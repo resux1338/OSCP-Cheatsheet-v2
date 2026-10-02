@@ -1,6 +1,6 @@
-# MSSQL: enumeration and AD paths
+# MSSQL: enumeration and access
 
-[← Active Directory quick reference](../05-active-directory.md) · [Database services](../enum/databases-and-redis.md#mssql-1433) · [MSSQL SQLi](../web/manual-sqli.md#mssql-string-context)
+[← Database services](databases-and-redis.md#mssql-1433) · [Active Directory quick reference](../05-active-directory.md) · [MSSQL SQLi](../web/manual-sqli.md#mssql-string-context)
 
 Record host/FQDN, instance, port, authentication type, original login, current SQL context, and Windows service account.
 
@@ -25,7 +25,7 @@ setspn.exe -Q MSSQLSvc/*
 Test-NetConnection -ComputerName '<SQL-FQDN>' -Port <SQL-PORT>
 ```
 
-SPN → host/instance/port + owning account. Check user-backed SPNs in [Kerberoasting](authentication.md#kerberoasting). Use connection strings from readable configs/shares; a listed SPN can be stale.
+SPN → host/instance/port + owning account. Check user-backed SPNs in [Kerberoasting](../ad/authentication.md#kerberoasting). Use connection strings from readable configs/shares; a listed SPN can be stale.
 
 ## Connect
 
@@ -48,7 +48,7 @@ impacket-mssqlclient -k -no-pass -dc-ip <DC-IP> -target-ip <SQL-IP> \
   -port <SQL-PORT> '<DOMAIN.TLD>/<USER>@<SQL-FQDN>'
 ```
 
-NT hash here = Windows account key. A SQL login's `password_hash` and a captured NetNTLMv2 response are different material. Kerberos: match `MSSQLSvc/<SQL-FQDN>:<SQL-PORT>`, DNS, clock, and ticket account. [Ticket checks](tickets.md) · [Kerberos fixes](kerberos-troubleshooting.md).
+NT hash here = Windows account key. A SQL login's `password_hash` and a captured NetNTLMv2 response are different material. Kerberos: match `MSSQLSvc/<SQL-FQDN>:<SQL-PORT>`, DNS, clock, and ticket account. [Ticket checks](../ad/tickets.md) · [Kerberos fixes](../ad/kerberos-troubleshooting.md).
 
 NetExec defaults to Windows authentication; `--local-auth` selects SQL authentication for this protocol:
 
@@ -133,7 +133,7 @@ SELECT OBJECT_DEFINITION(OBJECT_ID(N'<SCHEMA>.<PROCEDURE>')) AS definition;
 SELECT name, base_object_name FROM sys.synonyms;
 ```
 
-No tables/definition? Check current database, schema, `SELECT` / `VIEW DEFINITION`, and metadata visibility. Record a recovered value's database/table/column and account scope; test plausible reuse in [lateral movement](lateral-movement.md).
+No tables/definition? Check current database, schema, `SELECT` / `VIEW DEFINITION`, and metadata visibility. Record a recovered value's database/table/column and account scope; test plausible reuse in [lateral movement](../ad/lateral-movement.md).
 
 ## Login and user impersonation
 
@@ -438,12 +438,12 @@ EXEC master.dbo.xp_cmdshell 'netstat -ano';
 | Domain service account | Groups, shares, SPNs, object ACLs, allowed remote services |
 | Virtual service account / NetworkService / SYSTEM | Network authentication can use `<HOST>$`; verify the captured/used account |
 | `SeImpersonatePrivilege` / `SeAssignPrimaryTokenPrivilege` | Confirm token + required service/trigger in [Potato checks](../windows/potato.md) |
-| Local admin / SYSTEM | [Credential access](credential-access.md); check protections and exact rights |
+| Local admin / SYSTEM | [Windows credential access](../windows/credential-access.md); check protections and exact rights |
 | Readable application config / job command | Credential scope/source, then plausible reuse |
 | Loopback or internal SQL instance | [Pivot](../06-pivoting.md), then repeat the instance/login checks |
-| MSSQL service-account key | Match account + SPN + domain SID in [ticket notes](tickets.md); verify the resulting SQL role |
+| MSSQL service-account key | Match account + SPN + domain SID in [ticket notes](../ad/tickets.md); verify the resulting SQL role |
 
-Run [Windows host enumeration](../windows/windows-host-enum.md) and [AD enumeration](active-directory-enum.md) from a usable shell. SQL login impersonation alone does not supply a Windows credential for a second hop.
+Run [Windows host enumeration](../windows/enumeration.md) and [AD enumeration](../ad/active-directory-enum.md) from a usable shell. SQL login impersonation alone does not supply a Windows credential for a second hop.
 
 ## Quick fixes
 
