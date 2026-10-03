@@ -12,8 +12,8 @@ id; sudo -l; uname -r; cat /etc/os-release
 
 | Possible path | Quick fit check | Details |
 | --- | --- | --- |
-| Sudo rule | Read the exact binary, arguments, and environment that `sudo -l` allows. | [Sudo and root-run paths](linux/root-run.md) |
-| SUID or capability | List unusual binaries and capabilities; inspect what the binary does. | [SUID and capabilities](linux/root-run.md#sudo-and-suid) |
+| Sudo rule | Read the exact binary, arguments, environment, and run-as identity that `sudo -l` allows. | [Sudo rules](linux/sudo.md) |
+| SUID or capability | Check owner, execution context, retained identity, and the program's behavior. | [SUID and capabilities](linux/suid-and-capabilities.md) |
 | Root-run script or service | Can you change the file, a called command, its path, or its environment? Find the trigger. | [Root-run files](linux/root-run.md) |
 | Cron or timer | Confirm the run-as user, action, schedule, and writable component. | [Root-run files](linux/root-run.md#find-the-path) |
 | Privileged file write | Check whether a root process follows a path or archive entry you control. | [File-write paths](linux/file-write.md) |

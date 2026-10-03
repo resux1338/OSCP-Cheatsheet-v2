@@ -29,7 +29,7 @@ rpcclient -U '' -N <DC-IP> -c 'enumdomusers; enumdomgroups; getdompwinfo'
 smbclient -N -L //<DC-IP>
 ```
 
-If no usernames are known, a scoped Kerberos check can distinguish valid candidates. Failed pre-authentication counts toward lockout; learn the policy first when possible.
+If no usernames are known, a scoped Kerberos check can distinguish valid candidates. Kerbrute `userenum` sends requests without pre-authentication; its username check differs from password testing, which can increment failure counts and lock accounts. Enumeration can still generate events. [Kerbrute's documented behavior](https://github.com/ropnop/kerbrute#user-enumeration).
 
 ```bash
 kerbrute userenum -d <DOMAIN.TLD> --dc <DC-IP> <USER-LIST>
@@ -142,6 +142,10 @@ On each Windows foothold, follow [Windows host enumeration](../windows/enumerati
 | Interesting object ACL | Principal, exact right, target, inheritance, and current state | [Object rights](object-rights.md) |
 | GPO relationship | Right on the GPO, linked scope, and affected objects | [GPO edges](gpo-edges.md) |
 | Enrollment service or template | Enrollment rights and all template settings | [AD CS](adcs.md) |
+| Delegation attribute or descriptor | Direction, controlled service principal, allowed SPN/SIDs, and target-user restrictions | [Delegation](delegation.md) |
+| LAPS or gMSA lead | Effective read/decryption right and account/host/service scope | [Managed credentials](managed-credentials.md) |
+| DNS/operator group membership | DC/member-host scope, token, exact operation, and trigger | [Privileged groups](privileged-groups.md) |
+| Live NTLM authentication | Source policy, service signing/binding, destination rights | [NTLM relay](ntlm-relay.md) |
 | BloodHound path | Every edge and prerequisite, manually | [BloodHound](bloodhound.md) |
 
 ## References

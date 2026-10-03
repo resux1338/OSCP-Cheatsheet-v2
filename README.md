@@ -1,6 +1,6 @@
-# OSCP / OSCP+ Cheatsheet
+# resux-oscp-refsheets
 
-Offline OSCP command lookup. Check the current [OffSec exam guide](https://help.offsec.com/hc/en-us/articles/360040165632-OSCP-Exam-Guide) before the exam.
+Offline command reference sheets for OSCP/OSCP+ and CPTS practice, with selected deeper material. Check the current [OffSec exam guide](https://help.offsec.com/hc/en-us/articles/360040165632-OSCP-Exam-Guide) before the exam.
 
 Got a shell or domain credential? Check the low-hanging fruit first:
 
@@ -24,5 +24,13 @@ Pick a phase:
 | Password attacks and cracking | [07-password-attacks.md](07-password-attacks.md) |
 
 Replace `<TARGET-IP>` and `<KALI-IP>`; check local tool help for version-specific flags.
+
+Focused privilege and domain workflows:
+
+| Section | Detailed pages |
+| --- | --- |
+| Linux | [Sudo policy and execution](linux/sudo.md) · [SUID, SGID, and capabilities](linux/suid-and-capabilities.md) |
+| Windows | [Scheduled tasks and autoruns](windows/scheduled-tasks-and-autoruns.md) |
+| AD | [Delegation](ad/delegation.md) · [LAPS and gMSA](ad/managed-credentials.md) · [Privileged groups](ad/privileged-groups.md) · [NTLM relay](ad/ntlm-relay.md) |
 
 Helpers for executable references and VBA command chunks are in [scripts/](scripts/README.md).

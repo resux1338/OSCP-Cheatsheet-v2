@@ -17,7 +17,7 @@ env
 printf '%s\n' "$PATH"
 ```
 
-Read the exact command, arguments, run-as user, and environment allowed by every sudo rule. For a promising binary, continue with [sudo, SUID, and root-run paths](root-run.md).
+Read the exact command, arguments, run-as user, and environment allowed by every sudo rule. Continue with [sudo policy interpretation](sudo.md); use [root-run dependencies](root-run.md) for a privileged script or service.
 
 ## Users, homes, and credentials
 
@@ -93,7 +93,7 @@ find / -xdev -perm -2000 -type f -exec ls -la {} \; 2>/dev/null
 getcap -r / 2>/dev/null
 ```
 
-Compare unusual binaries with their owner, version, arguments, and intended behavior. `-xdev` keeps the first pass fast; inspect other mounted filesystems separately when they matter.
+Compare unusual binaries with their owner, version, arguments, and intended behavior. `-xdev` keeps the first pass fast; inspect other mounted filesystems separately when they matter. Check effective identity, mount flags, and capability scope in [SUID and capabilities](suid-and-capabilities.md).
 
 ## Writable privileged paths
 
@@ -124,8 +124,8 @@ Inspect a script and its version before running it. OffSec permits automatic enu
 
 | Signal | Confirm next | Deeper notes |
 | --- | --- | --- |
-| Sudo rule | Exact binary, arguments, environment, and run-as user | [Root-run paths](root-run.md) |
-| Unusual SUID/SGID or capability | Owner, capability or mode, program behavior, and version | [SUID and capabilities](root-run.md#sudo-and-suid) |
+| Sudo rule | Exact binary, arguments, environment, and run-as user | [Sudo rules](sudo.md) |
+| Unusual SUID/SGID or capability | Owner, capability or mode, retained identity, mount context, and behavior | [SUID and capabilities](suid-and-capabilities.md) |
 | Root cron, timer, or service | Privileged caller, writable component, and trigger | [Root-run files](root-run.md) |
 | Writable privileged destination | Whether the privileged process follows or overwrites that path | [File-write paths](file-write.md) |
 | Docker, LXD, or privileged socket | Group membership, socket ACL, and rootful daemon | [Groups and containers](groups-and-nfs.md) |

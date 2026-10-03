@@ -1,4 +1,4 @@
-# Windows services and scheduled tasks
+# Windows services and installer policy
 
 [← Windows quick reference](../04-windows-privesc.md)
 
@@ -10,12 +10,7 @@ For each service: account + changeable object/file + trigger.
 
 ## Scheduled tasks
 
-```powershell
-Get-ScheduledTask | Select-Object TaskName,State,Actions,Principal
-schtasks.exe /query /fo LIST /v
-```
-
-Task: principal, action, trigger, writable executable/script; restore replaced file.
+Use [scheduled tasks and autoruns](scheduled-tasks-and-autoruns.md) for action/principal inspection, file versus task permissions, a benign identity proof, run-result diagnosis, and restoration.
 
 ## Installer policy
 

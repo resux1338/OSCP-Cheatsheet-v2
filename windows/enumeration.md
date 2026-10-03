@@ -26,7 +26,7 @@ Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 20
 Get-MpComputerStatus
 ```
 
-Missing cmdlets are normal on older hosts. Fall back to `systeminfo`, `wmic`, or the matching `cmd.exe` command rather than assuming the information is unavailable.
+When a cmdlet is unavailable, use `systeminfo` or the matching native command. WMIC is a legacy fallback only where it is installed; current Windows releases may remove it. [Microsoft WMIC removal guidance](https://support.microsoft.com/en-us/servicing/os/windows/docs/2025/09/windows-management-instrumentation-command-line-wmic-removal-from-windows).
 
 ## Users, groups, and sessions
 
@@ -46,7 +46,7 @@ Get-LocalGroupMember -Group '<LOCAL-ADMIN-GROUP>'
 Get-CimInstance Win32_LoggedOnUser
 ```
 
-Use the localized administrator-group name when the host is not English. Check each unusual group or token privilege in [privileged groups and token rights](token-groups.md).
+Use the localized administrator-group name when the host is not English. Check [local token rights](token-groups.md); domain/DC group routes have their own [scope and operation checks](../ad/privileged-groups.md).
 
 ## Processes, software, and local services
 
@@ -100,7 +100,7 @@ reg query HKCU\Software\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 reg query HKLM\Software\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 ```
 
-Both installer-policy values must be enabled before this is a valid lead. See [services and scheduled tasks](services.md).
+Both installer-policy values must be enabled before this is a valid lead. Follow [tasks and autoruns](scheduled-tasks-and-autoruns.md) for principal/action/trigger checks and [installer policy](services.md#installer-policy) for the installer route.
 
 ## Targeted credential checks
 
@@ -179,11 +179,11 @@ Get-MpComputerStatus
 
 | Signal | Confirm next | Deeper notes |
 | --- | --- | --- |
-| Interesting token privilege | Present and enabled in this process; required service or resource exists | [Token rights](token-groups.md) · [Potato checks](potato.md) |
+| Interesting token privilege | Present in this token; selected method can enable/use it and required resource exists | [Token rights](token-groups.md) · [Potato checks](potato.md) |
 | Writable service executable | Service account, exact ACL, and restart trigger | [Service binary hijacking](service-binary-hijacking.md) |
 | Modifiable service configuration | Exact service right and start/stop ability | [Service permissions](service-permissions.md) |
 | Unquoted service path | Candidate prefix exists and is writable | [Unquoted paths](unquoted-service-paths.md) |
-| Writable task, autorun, or DLL path | Privileged consumer and reproducible trigger | [Tasks](services.md) · [DLL checks](dll-hijacking.md) |
+| Writable task, autorun, or DLL path | Exact ACL, privileged consumer, and reproducible trigger | [Tasks and autoruns](scheduled-tasks-and-autoruns.md) · [DLL checks](dll-hijacking.md) |
 | Saved credential or config secret | Account scope and accepted logon method | [Credential checks](credentials.md) |
 | Local-only service | Owning process, version, authentication, and forwarding route | [Pivoting](../06-pivoting.md) |
 

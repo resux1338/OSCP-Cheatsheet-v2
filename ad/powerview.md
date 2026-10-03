@@ -322,7 +322,7 @@ Get-DomainComputer -LDAPFilter '(msDS-AllowedToActOnBehalfOfOtherIdentity=*)' @L
 
 Constrained: controlled account + allowed SPN. RBCD: decode descriptor → allowed SIDs.
 
-New RBCD path needs target-attribute write + controlled service principal. [Delegation](tickets.md) · [Object rights](object-rights.md).
+New RBCD path needs target-attribute write + controlled service principal. Use [delegation workflows and descriptor restoration](delegation.md) after discovery. [Object rights](object-rights.md).
 
 ### LAPS
 
@@ -340,7 +340,7 @@ Get-DomainComputer -Identity '<HOST-FQDN>' @LDAP `
 | `msLAPS-Password` | Windows LAPS JSON password |
 | `msLAPS-EncryptedPassword` | Ciphertext; needs decryption rights + LAPS module |
 
-Windows LAPS decryption: `Get-LapsADPassword`. Match local account + host.
+Windows LAPS decryption: `Get-LapsADPassword`. Match local account + host and confirm decryption status in [LAPS and gMSA workflows](managed-credentials.md).
 
 Empty field: no read right / different storage / no value.
 

@@ -39,8 +39,8 @@ hashcat -m 5600 netntlmv2.txt /usr/share/wordlists/rockyou.txt
 hashcat --show -m 5600 netntlmv2.txt
 ```
 
-Use only a captured response you are authorized to test. If cracking fails, keep the capture as evidence and move on; it cannot be used as an NT hash. NTLM relay is a separate path requiring a live authentication and a suitable target/service. The original vault note had only an untested manual-relay TODO, so there is no relay recipe here; do not infer that a captured string alone can be relayed.
+Use a captured response for offline cracking; it cannot be used as an NT hash. [NTLM relay](../ad/ntlm-relay.md) needs a fresh live exchange, a suitable destination, its signing/binding prerequisites, and the relayed account's rights. A captured string cannot simply be relayed to a new challenge.
 
 Exam note: OffSec's current FAQ lists Responder and Impacket but forbids poisoning/spoofing; its guide also restricts automatic exploitation and restricted features inside otherwise allowed tools. `-A` is Responder's documented no-response analysis mode for name-resolution queries. Check the current [exam guide](https://help.offsec.com/hc/en-us/articles/360040165632-OSCP-Exam-Guide) and [FAQ](https://help.offsec.com/hc/en-us/articles/4412170923924-OSCP-Exam-FAQ) before using any relay or name-resolution feature. Do not label a specific `ntlmrelayx` invocation categorically permitted or banned from the tool name alone.
 
-References: [`ntlm_theft` usage and file types](https://github.com/Greenwolf/ntlm_theft) · [Responder analyze mode](https://github.com/SpiderLabs/Responder/blob/master/README.md) · [OffSec OSCP+ FAQ](https://help.offsec.com/hc/en-us/articles/4412170923924-OSCP-Exam-FAQ).
+References: [`ntlm_theft` usage and file types](https://github.com/Greenwolf/ntlm_theft) · [Maintained Responder](https://github.com/lgandx/Responder) · [OffSec OSCP+ FAQ](https://help.offsec.com/hc/en-us/articles/4412170923924-OSCP-Exam-FAQ).

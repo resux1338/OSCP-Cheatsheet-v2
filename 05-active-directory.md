@@ -21,6 +21,10 @@ From a Windows domain shell, use the [PowerView reference](ad/powerview.md) for 
 | Local admin or SYSTEM | Can you read local secrets through a confirmed right? | [Windows credential access](windows/credential-access.md) |
 | DC database or replication right | Can you read a DC database or replicate directory secrets? | [AD credential access](ad/credential-access.md) |
 | Ticket material | Match the key or ticket to its account, SPN, service, and domain. | [Tickets](ad/tickets.md) |
+| Delegation | Confirm direction, controlled service principal, allowed SPN/descriptor, and target-user restrictions. | [Delegation](ad/delegation.md) |
+| LAPS or gMSA | Separate reading/decrypting material from the managed account's actual host/service access. | [Managed credentials](ad/managed-credentials.md) |
+| Privileged group | Confirm DC/member-host scope, active token, exact operation, and restoration path. | [AD/DC groups](ad/privileged-groups.md) |
+| Live NTLM authentication | Check source policy, destination signing/binding, and the relayed account's rights. | [NTLM relay](ad/ntlm-relay.md) |
 | Kerberos fails | Check FQDN, DNS, clock skew, SPN, and the ticket cache. | [Kerberos checks](ad/kerberos-troubleshooting.md) |
 | Login but no execution | Check local admin rights and whether the matching remote service is open. | [Lateral movement](ad/lateral-movement.md) |
 | Advanced object path | Check prerequisite rights and DC support before changing an object. | [Advanced object paths](ad/object-rights.md#sealed-ldap-object-restore--newer-primitives) |
